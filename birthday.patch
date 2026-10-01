@@ -1,0 +1,1933 @@
+diff --git a/.env.example b/.env.example
+index d6eab5b..8384c97 100644
+--- a/.env.example
++++ b/.env.example
+@@ -1,13 +1,13 @@
+ # Some Hosting providers need you to set variables on their service, so please be sure you set it too
+ VITE_HOST="http://domain.com"
+-VITE_APP_TITLE="Genshin Impact Wish Simulator"
+-VITE_DESCRIPTION="Simulate gacha with no cost on the latest banner. Get experience when wishing character or weapon that promoted on the current banner for free"
+-VITE_KEYWORDS="Genshin Impact Wish simulator, Gacha simulator, genshin Gacha, free gacha, free wish, free primogem, genshin impact banner, Character Event, Weapon Event"
++VITE_APP_TITLE="Happy Birthday Ericka!"
++VITE_DESCRIPTION="Happy Birthday!"
++VITE_KEYWORDS="Happy Birthday"
+ 
+ # Server Side API, used for Cloud Sync, Authentication and Custom Banner Sharing.
+ # Leave it blank if you don't need this feature
+ # Source code for Server => https://github.com/Mantan21/WishSimulator-API
+-VITE_API_HOST="https://api.wishsimulator.app/"
++VITE_API_HOST=""
+ 
+ # Drive Sync
+ VITE_GOOGLE_API_KEY="Google Credential API Key"
+diff --git a/src/app.html b/src/app.html
+index 18818cd..8dc4eb4 100644
+--- a/src/app.html
++++ b/src/app.html
+@@ -8,7 +8,6 @@
+ 		/>
+ 		<meta name="a.validate.02" content="gc8Hcbkq-w-3WEWF_q38cMwWsDdHhE5icT8F" />
+ 		<meta name="google-site-verification" content="zn73VlG6JLf_oG3P8jQVbKGlDkQ9s6JcR6qZLzT2tVI" />
+-		<meta name="google-adsense-account" content="ca-pub-1874822310102113" />
+ 
+ 		<meta property="og:type" content="profile" />
+ 		<meta property="profile:username" content="AguzzTN54" />
+@@ -26,7 +25,7 @@
+ 		<meta property="og:locale:alternate" content="th_TH" />
+ 		<meta property="og:locale:alternate" content="vi_VN" />
+ 		<meta property="og:locale:alternate" content="zh_CN" />
+-		<title>Genshin Impact Wish Simulator</title>
++		<title>Happy Birthday Ericka!</title>
+ 
+ 		<link rel="stylesheet" href="/icons.css" />
+ 		<link rel="icon" href="/favicon.ico" />
+@@ -37,15 +36,6 @@
+ 
+ 		%sveltekit.head%
+ 
+-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-211756322-1"></script>
+-		<script>
+-			window.dataLayer = window.dataLayer || [];
+-			function gtag() {
+-				dataLayer.push(arguments);
+-			}
+-			gtag('js', new Date());
+-			gtag('config', 'UA-211756322-1');
+-		</script>
+ 	</head>
+ 	<body>
+ 		<div id="svelte" class="svelte">%sveltekit.body%</div>
+diff --git a/src/lib/data/birthday-config.js b/src/lib/data/birthday-config.js
+new file mode 100644
+index 0000000..7c4e2c2
+--- /dev/null
++++ b/src/lib/data/birthday-config.js
+@@ -0,0 +1,412 @@
++/* ==========================================================================
++ * BIRTHDAY CONFIG: almost everything you need to edit lives in this file.
++ * Search for "TODO(birthday)" to find every spot.
++ * ========================================================================== */
++
++// TODO(birthday): her name
++export const HER_NAME = 'Ericka';
++
++// TODO(birthday): text shown in the browser tab (also set VITE_APP_TITLE in .env)
++export const SITE_TITLE = 'Happy Birthday Ericka!';
++
++// ---- Opening popup ---------------------------------------------------------
++export const WELCOME = {
++	// TODO(birthday): the BIG text on the opening popup
++	heading: 'Happy Birthday!',
++	// TODO(birthday): the message under the big text
++	message: 'TODO: write your birthday message here'
++};
++
++// ---- Wishing rules ---------------------------------------------------------
++// true  = every x10 pull always contains at least one 5-star (so the golden 5-star animation always plays)
++// false = normal random rates
++export const GUARANTEE_5_STAR_ON_TEN_PULL = true;
++
++// ---- The 2 banners ----------------------------------------------------------
++// Banner 1 uses INTERTWINED fates, banner 2 uses ACQUAINT fates.
++// Do not change `type`. Everything else is yours to edit.
++export const BANNERS = [
++	{
++		type: 'character-event', // uses Intertwined Fate. Do not change.
++		character: 'birthday-event', // internal id, do not change
++		bannerName: 'birthday-event', // internal id, do not change
++		// TODO(birthday): small label on top of the banner
++		tag: 'Event Wish',
++		// TODO(birthday): banner title
++		title: 'Infinite Love & Wishes',
++		// TODO(birthday): subtitle
++		subtitle: 'TODO: banner subtitle',
++		// TODO(birthday): description lines (add or remove lines freely)
++		description: ['TODO: description line 1', 'TODO: description line 2'],
++		// TODO(birthday): big banner picture, e.g. '/banners/event.jpg' (file goes in the /static/banners folder). Best size ~1080x533. Leave '' for a plain gradient.
++		image: '',
++		// TODO(birthday): small square picture for the banner switch button at the top, e.g. '/banners/event-button.png'
++		buttonImage: '',
++		// TODO(birthday): item names (from ITEMS below) shown as "featured" and boosted on this banner
++		featuredIds: ['birthday-item-01', 'birthday-item-02'],
++		// TODO(birthday): % chance that a 5-star / 4-star pull becomes one of the featured items (0 - 100)
++		featuredChance: 50,
++		// TODO(birthday): optional. List of item names this banner can drop, or null for ALL items
++		itemPool: null
++	},
++	{
++		type: 'standard', // uses Acquaint Fate. Do not change.
++		character: 'birthday-standard', // internal id, do not change
++		bannerName: 'birthday-standard', // internal id, do not change
++		// TODO(birthday): small label on top of the banner
++		tag: 'Standard Wish',
++		// TODO(birthday): banner title
++		title: 'Everyday Wishes',
++		// TODO(birthday): subtitle
++		subtitle: 'TODO: banner subtitle',
++		// TODO(birthday): description lines
++		description: ['TODO: description line 1', 'TODO: description line 2'],
++		// TODO(birthday): e.g. '/banners/standard.jpg'
++		image: '',
++		// TODO(birthday): e.g. '/banners/standard-button.png'
++		buttonImage: '',
++		// TODO(birthday): featured item names
++		featuredIds: ['birthday-item-03', 'birthday-item-04', 'birthday-item-05'],
++		featuredChance: 50,
++		itemPool: null
++	}
++];
++
++// ---- All prizes (the ONLY items that can drop) -------------------------------
++// 30 slots: 5 five-star, 10 four-star, 15 three-star.
++// Add more slots by copying a block (use a new unique itemID and name), delete slots you don't need.
++// Keep at least 1 item of each rarity (3, 4 and 5 stars) or pulls will fall back to other items.
++// `name` is internal, do not rename. Change `label` to rename the prize.
++// `weaponType` only controls the layout of the picture on the result screen (try 'sword', 'bow', 'claymore', 'polearm' or 'catalyst').
++export const ITEMS = [
++	// ---- SLOT 01 · 5-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): e.g. Handmade Glaze Lily Bouquet
++	{
++		itemID: 990001,
++		name: 'birthday-item-01',
++		label: 'TODO ★★★★★ Item 01',
++		rarity: 5,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 02 · 5-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): e.g. 100 Wishes Jar
++	{
++		itemID: 990002,
++		name: 'birthday-item-02',
++		label: 'TODO ★★★★★ Item 02',
++		rarity: 5,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 03 · 5-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): e.g. a flower from the Flower Codex (Mondstadt Cecilia)
++	{
++		itemID: 990003,
++		name: 'birthday-item-03',
++		label: 'TODO ★★★★★ Item 03',
++		rarity: 5,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 04 · 5-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): e.g. a real gift she will get
++	{
++		itemID: 990004,
++		name: 'birthday-item-04',
++		label: 'TODO ★★★★★ Item 04',
++		rarity: 5,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 05 · 5-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): e.g. a coupon / date / surprise
++	{
++		itemID: 990005,
++		name: 'birthday-item-05',
++		label: 'TODO ★★★★★ Item 05',
++		rarity: 5,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 06 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990006,
++		name: 'birthday-item-06',
++		label: 'TODO ★★★★ Item 06',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 07 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990007,
++		name: 'birthday-item-07',
++		label: 'TODO ★★★★ Item 07',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 08 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990008,
++		name: 'birthday-item-08',
++		label: 'TODO ★★★★ Item 08',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 09 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990009,
++		name: 'birthday-item-09',
++		label: 'TODO ★★★★ Item 09',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 10 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990010,
++		name: 'birthday-item-10',
++		label: 'TODO ★★★★ Item 10',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 11 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990011,
++		name: 'birthday-item-11',
++		label: 'TODO ★★★★ Item 11',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 12 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990012,
++		name: 'birthday-item-12',
++		label: 'TODO ★★★★ Item 12',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 13 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990013,
++		name: 'birthday-item-13',
++		label: 'TODO ★★★★ Item 13',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 14 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990014,
++		name: 'birthday-item-14',
++		label: 'TODO ★★★★ Item 14',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 15 · 4-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 4-star prize (smaller gift, a flower, a treat...)
++	{
++		itemID: 990015,
++		name: 'birthday-item-15',
++		label: 'TODO ★★★★ Item 15',
++		rarity: 4,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 16 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990016,
++		name: 'birthday-item-16',
++		label: 'TODO ★★★ Item 16',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 17 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990017,
++		name: 'birthday-item-17',
++		label: 'TODO ★★★ Item 17',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 18 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990018,
++		name: 'birthday-item-18',
++		label: 'TODO ★★★ Item 18',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 19 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990019,
++		name: 'birthday-item-19',
++		label: 'TODO ★★★ Item 19',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 20 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990020,
++		name: 'birthday-item-20',
++		label: 'TODO ★★★ Item 20',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 21 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990021,
++		name: 'birthday-item-21',
++		label: 'TODO ★★★ Item 21',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 22 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990022,
++		name: 'birthday-item-22',
++		label: 'TODO ★★★ Item 22',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 23 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990023,
++		name: 'birthday-item-23',
++		label: 'TODO ★★★ Item 23',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 24 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990024,
++		name: 'birthday-item-24',
++		label: 'TODO ★★★ Item 24',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 25 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990025,
++		name: 'birthday-item-25',
++		label: 'TODO ★★★ Item 25',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 26 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990026,
++		name: 'birthday-item-26',
++		label: 'TODO ★★★ Item 26',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 27 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990027,
++		name: 'birthday-item-27',
++		label: 'TODO ★★★ Item 27',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 28 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990028,
++		name: 'birthday-item-28',
++		label: 'TODO ★★★ Item 28',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 29 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990029,
++		name: 'birthday-item-29',
++		label: 'TODO ★★★ Item 29',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	},
++	// ---- SLOT 30 · 3-STAR ----
++	// TODO(birthday): change `label` (name shown in the wish result) and `image`.
++	// TODO(birthday): a 3-star prize (small stuff: sticker, snack, hug coupon...)
++	{
++		itemID: 990030,
++		name: 'birthday-item-30',
++		label: 'TODO ★★★ Item 30',
++		rarity: 3,
++		weaponType: 'catalyst',
++		image: '' // TODO(birthday): e.g. '/items/lily.png' (file goes in the /static/items folder)
++	}
++];
+diff --git a/src/lib/data/characters.js b/src/lib/data/characters.js
+new file mode 100644
+index 0000000..9c9ab65
+--- /dev/null
++++ b/src/lib/data/characters.js
+@@ -0,0 +1,4 @@
++// The birthday version has no characters. All prizes live in birthday-config.js
++export const onlyStandard = [];
++export const data = [];
++export default { onlyStandard, data };
+diff --git a/src/lib/data/weapons.js b/src/lib/data/weapons.js
+new file mode 100644
+index 0000000..2f74123
+--- /dev/null
++++ b/src/lib/data/weapons.js
+@@ -0,0 +1,10 @@
++import { ITEMS } from './birthday-config';
++
++// All prizes live in birthday-config.js. This file only adapts them to the format the app expects.
++export const data = ITEMS.map(({ itemID, name, rarity, weaponType }) => ({
++	itemID,
++	name,
++	rarity,
++	weaponType
++}));
++export default { data };
+diff --git a/src/lib/data/wish-setup.json b/src/lib/data/wish-setup.json
+index 89e4bbd..4d778f9 100644
+--- a/src/lib/data/wish-setup.json
++++ b/src/lib/data/wish-setup.json
+@@ -8,10 +8,10 @@
+ 		5.4, 5.5, 5.6, 5.7, 5.8, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6
+ 	],
+ 	"initialAmount": {
+-		"primogem": 0,
+-		"fates": 0,
++		"primogem": 0,
++		"fates": 0,
+ 		"genesis": 0,
+-		"shareReward": 0
++		"shareReward": 0
+ 	},
+ 	"welkinReward": {
+ 		"primogem": 8000,
+diff --git a/src/lib/env.js b/src/lib/env.js
+index 052dd51..9c282d6 100644
+--- a/src/lib/env.js
++++ b/src/lib/env.js
+@@ -1,7 +1,7 @@
+ const host = import.meta.env.VITE_HOST || '';
+ export const HOST = host.replace(/^\/|\/$/g, '');
+ 
+-export const APP_TITLE = import.meta.env.VITE_APP_TITLE || 'Genshin Impact Wish Simulator';
++export const APP_TITLE = import.meta.env.VITE_APP_TITLE || 'Happy Birthday Ericka!';
+ export const DESCRIPTION = import.meta.env.VITE_DESCRIPTION || '';
+ export const KEYWORDS = import.meta.env.VITE_KEYWORDS || '';
+ 
+diff --git a/src/lib/helpers/banner-loader.js b/src/lib/helpers/banner-loader.js
+index 419ed06..2092e34 100644
+--- a/src/lib/helpers/banner-loader.js
++++ b/src/lib/helpers/banner-loader.js
+@@ -1,6 +1,7 @@
+ import { beginner } from '$lib/data/banners/beginner.json';
+ import { standard } from '$lib/data/banners/standard.json';
+ import { version, wishPhase } from '$lib/data/wish-setup.json';
++import { BANNERS } from '$lib/data/birthday-config';
+ 
+ import { imageCDN } from './assets';
+ import { BannerManager } from './dataAPI/api-indexeddb';
+@@ -72,34 +73,16 @@ const checkBeginnerBanner = () => {
+ 	return isShowBeginner;
+ };
+ 
+-export const initializeBanner = async ({ patch, phase }) => {
++export const initializeBanner = async () => {
++	// Birthday version: the 2 banners come from src/lib/data/birthday-config.js
+ 	try {
+-		if (!patch || !phase) return;
+-		if (patch.match(/(local|custom)/gi)) return useCustomBanner(phase);
+-
+-		const list = checkBeginnerBanner() ? [{ type: 'beginner', ...beginner.featured }] : [];
+-
+-		const { data } = await import(`$lib/data/banners/events/${patch}.json`);
+-		const { banners } = data.find((b) => b.phase === phase);
+-		const { events, weapons, standardVersion: stdver, chronicled = null } = banners;
+-		const { featured: stdFeatured } = standard.find(({ version }) => stdver === version) || {};
+-
+-		const charEventBanner = {
+-			type: 'character-event',
+-			rateup: events.rateup,
+-			stdver
+-		};
+-		events.featured.forEach((eventdata) => list.push({ ...eventdata, ...charEventBanner }));
+-		list.push({ type: 'weapon-event', stdver, ...weapons });
+-		if (chronicled) list.push({ type: 'chronicled', stdver, ...chronicled });
+-		list.push({ type: 'standard', stdver, ...stdFeatured });
+-
++		const list = BANNERS.map((banner) => ({ ...banner, birthday: true }));
+ 		bannerList.set(list);
+-		isFatepointSystem.set(!!weapons.fatepointsystem);
++		isFatepointSystem.set(false);
+ 
+-		activeVersion.set({ patch, phase });
++		activeVersion.set({ patch: version, phase: wishPhase });
+ 		activeBanner.set(0);
+-		localConfig.set('version', `${patch}-${phase}`);
++		localConfig.set('version', `${version}-${wishPhase}`);
+ 
+ 		customData.set({});
+ 		isCustomBanner.set(false);
+@@ -110,14 +93,5 @@ export const initializeBanner = async ({ patch, phase }) => {
+ 	}
+ };
+ 
+-export const handleShowStarter = (isShow) => {
+-	if (!isShow) {
+-		return bannerList.update((bn) => {
+-			return bn.filter(({ type }) => type !== 'beginner');
+-		});
+-	}
+-	return bannerList.update((bn) => {
+-		bn.unshift({ type: 'beginner', ...beginner.featured });
+-		return bn;
+-	});
+-};
++// No beginner banner in the birthday version
++export const handleShowStarter = () => {};
+diff --git a/src/lib/helpers/gacha/Wish.js b/src/lib/helpers/gacha/Wish.js
+index 1d64627..9c31173 100644
+--- a/src/lib/helpers/gacha/Wish.js
++++ b/src/lib/helpers/gacha/Wish.js
+@@ -1,130 +1,37 @@
+-import { standard } from '$lib/data/banners/standard.json';
+-import { fatepointManager } from '../dataAPI/api-localstore';
+-import { course as wpCourse, chronicledCourse } from '$lib/store/app-stores';
+-import characterWish from './wishCharacter';
+-import beginerWish from './wishBeginner';
+-import weaponWish from './wishWeapon';
+-import standardWish from './wishStandard';
++import { BANNERS, ITEMS } from '$lib/data/birthday-config';
+ import roll from './roll';
+-import chronicledWish from './wishChronicled';
+ 
+-const initLoadFatepoint = (version, phase) => {
+-	['weapon-event', 'chronicled'].forEach((banner) => {
+-		const localFate = fatepointManager.init({ phase, version, banner });
+-		const { selected, point, type } = localFate.getInfo();
+-		if (banner.match('weapon')) return wpCourse.set({ point, selected });
+-		chronicledCourse.set({ point, selected, type });
+-	});
+-};
++const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+ 
++// Birthday version: prizes come only from src/lib/data/birthday-config.js
+ const WISH = {
+-	async init(version, phase, customData) {
+-		this._version = version;
+-		this._phase = phase;
+-
+-		if (version.match(/(custom|local)/gi)) return this._initCustom(customData);
+-		const { data } = await import(`../../data/banners/events/${version}.json`);
+-		const { standardVersion, weapons, events, chronicled } = data.find(
+-			(d) => d.phase === phase
+-		).banners;
+-		initLoadFatepoint(version, phase);
+-
+-		this._characters = events;
+-		this._isDualBanner = events.featured?.length > 1;
+-		this._weapons = weapons;
+-		this._chronicled = chronicled;
+-		this._standardVer = standardVersion;
+-		this._customData = {};
++	async init() {
+ 		return this;
+ 	},
+ 
+-	_initCustom(customData) {
+-		this._customData = customData;
+-		this._standardVer = standard.reverse()[0].version;
+-		const { character = '', rateup = [], bannerName = '' } = customData;
+-		this._characters = {
+-			rateup,
+-			featured: [{ bannerName, character }]
+-		};
+-		return this;
+-	},
+-
+-	_characterWish(rarity, indexOfBanner) {
+-		const { featured, rateup } = this._characters;
+-		const eventBanner = characterWish.init({
+-			version: this._version,
+-			phase: this._phase,
+-			stdver: this._standardVer,
+-			customData: this._customData,
+-			indexOfBanner,
+-			featured,
+-			rateup
+-		});
+-
+-		const result = eventBanner.get(rarity);
+-		result.bannerName = featured[indexOfBanner].bannerName;
+-		return result;
+-	},
+-
+-	_weaponWish(rarity) {
+-		const { _weapons, _phase: phase, _version: version } = this;
+-		const { fatepointsystem: fatesystem = false, featured, rateup } = _weapons;
+-		const weaponBanner = weaponWish.init({
+-			fatesystemON: fatesystem,
+-			featured,
+-			phase,
+-			version,
+-			rateup
+-		});
+-		const result = weaponBanner.get(rarity);
+-		result.bannerName = _weapons.bannerName;
+-		return result;
+-	},
+-
+-	_chronicledWish(rarity) {
+-		const { _chronicled } = this;
+-		const { bannerName, characters, weapons, region } = _chronicled;
+-		const chronicledBanner = chronicledWish.init({
+-			version: this._version,
+-			phase: this._phase,
+-			stdver: this._standardVer,
+-			characters,
+-			weapons,
+-			region
+-		});
+-		const result = chronicledBanner.get(rarity);
+-		result.bannerName = bannerName;
+-		return result;
+-	},
+-
+-	_beginnerWish(rarity) {
+-		const result = beginerWish(rarity);
+-		result.bannerName = 'beginner';
+-		return result;
+-	},
+-
+-	_standardWish(rarity) {
+-		const { _standardVer: stdver, _phase: phase, _version: version } = this;
+-		const standardBanner = standardWish.init({ stdver, phase, version });
+-		const result = standardBanner.get(rarity);
+-		result.bannerName = `wanderlust-invocation-${stdver}`;
+-		return result;
+-	},
+-
+-	getItem(rarity, banner, indexOfBanner) {
++	getItem(rarity, banner) {
+ 		const date = new Date();
+ 		const time = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+-		const resultObj = { time, banner };
+-
+-		if (banner === 'beginner') return { ...resultObj, ...this._beginnerWish(rarity) };
+-		if (banner === 'standard') return { ...resultObj, ...this._standardWish(rarity) };
+-		if (banner === 'weapon-event') return { ...resultObj, ...this._weaponWish(rarity) };
+-		if (banner === 'chronicled') return { ...resultObj, ...this._chronicledWish(rarity) };
+-		if (banner === 'character-event') {
+-			return { ...resultObj, ...this._characterWish(rarity, indexOfBanner) };
+-		}
+-
+-		return { type: null, rarity: 0, name: null };
++		const cfg = BANNERS.find(({ type }) => type === banner) || {};
++
++		let pool = ITEMS.filter((item) => item.rarity === rarity);
++		if (cfg.itemPool) pool = pool.filter(({ name }) => cfg.itemPool.includes(name));
++		if (pool.length === 0) pool = ITEMS; // safety net if a rarity has no items
++
++		const featured = pool.filter(({ name }) => (cfg.featuredIds || []).includes(name));
++		const useFeatured = featured.length > 0 && Math.random() * 100 < (cfg.featuredChance ?? 50);
++		const chosen = pick(useFeatured ? featured : pool);
++
++		return {
++			time,
++			banner,
++			type: 'weapon',
++			name: chosen.name,
++			itemID: chosen.itemID,
++			rarity: chosen.rarity,
++			weaponType: chosen.weaponType,
++			bannerName: cfg.bannerName
++		};
+ 	}
+ };
+ 
+diff --git a/src/lib/helpers/gacha/itemdrop-base.js b/src/lib/helpers/gacha/itemdrop-base.js
+index 86d6cad..e6a4293 100644
+--- a/src/lib/helpers/gacha/itemdrop-base.js
++++ b/src/lib/helpers/gacha/itemdrop-base.js
+@@ -1,6 +1,6 @@
+ import { standard } from '$lib/data/banners/standard.json';
+-import { data as weaponsDB } from '$lib/data/weapons.json';
+-import { data as charsDB, onlyStandard } from '$lib/data/characters.json';
++import { data as weaponsDB } from '$lib/data/weapons.js';
++import { data as charsDB, onlyStandard } from '$lib/data/characters.js';
+ import { getRate, prob } from './probabilities';
+ import { guaranteedStatus } from '../dataAPI/api-localstore';
+ 
+diff --git a/src/lib/helpers/gacha/roll.js b/src/lib/helpers/gacha/roll.js
+index d168165..e84d5cd 100644
+--- a/src/lib/helpers/gacha/roll.js
++++ b/src/lib/helpers/gacha/roll.js
+@@ -12,7 +12,7 @@ const { addHistory } = HistoryManager;
+  * @param {number} indexOfBanner Index Of active banner among the dual banner
+  * @returns Wish Result Object
+  */
+-const roll = async (banner, WishInstance, indexOfBanner) => {
++const roll = async (banner, WishInstance, indexOfBanner, forceRarity = null) => {
+ 	const pity5 = localPity.get(`pity5-${banner}`) + 1;
+ 	const pity4 = localPity.get(`pity4-${banner}`) + 1;
+ 	const maxPity = getRate(banner, 'max5');
+@@ -58,7 +58,7 @@ const roll = async (banner, WishInstance, indexOfBanner) => {
+ 		}
+ 	];
+ 
+-	const { rarity } = prob(item);
++	const rarity = forceRarity || prob(item).rarity;
+ 	let pity = 1;
+ 
+ 	const rollQty = rollCounter.get(banner);
+diff --git a/src/lib/helpers/gacha/wishBase.js b/src/lib/helpers/gacha/wishBase.js
+index 2ed5eba..69a901e 100644
+--- a/src/lib/helpers/gacha/wishBase.js
++++ b/src/lib/helpers/gacha/wishBase.js
+@@ -1,5 +1,5 @@
+-import weaponsDB from '$lib/data/weapons.json';
+-import charsDB from '$lib/data/characters.json';
++import weaponsDB from '$lib/data/weapons.js';
++import charsDB from '$lib/data/characters.js';
+ 
+ const rand = (array) => array[Math.floor(Math.random() * array.length)];
+ 
+diff --git a/src/lib/helpers/i18n.js b/src/lib/helpers/i18n.js
+index 9352ea4..f047e9c 100644
+--- a/src/lib/helpers/i18n.js
++++ b/src/lib/helpers/i18n.js
+@@ -1,5 +1,6 @@
+ import { browser } from '$app/environment';
+-import { init, register, getLocaleFromNavigator } from 'svelte-i18n';
++import { init, register, addMessages, getLocaleFromNavigator } from 'svelte-i18n';
++import { ITEMS } from '$lib/data/birthday-config';
+ import { localConfig } from './dataAPI/api-localstore';
+ 
+ const supportedLocales = [
+@@ -39,6 +40,11 @@ const checkLocale = () => {
+ };
+ 
+ const mountLocale = () => {
++	// Prize names come from birthday-config.js
++	const prizeNames = {};
++	ITEMS.forEach(({ name, label }) => (prizeNames[name] = label));
++	supportedLocales.forEach((langID) => addMessages(langID, prizeNames));
++
+ 	supportedLocales.forEach((langID) => {
+ 		register(langID, () => import(`../../locales/${langID}.json`));
+ 	});
+diff --git a/src/lib/helpers/migrator/IDBUpdater.js b/src/lib/helpers/migrator/IDBUpdater.js
+index 83a9c97..b64293b 100644
+--- a/src/lib/helpers/migrator/IDBUpdater.js
++++ b/src/lib/helpers/migrator/IDBUpdater.js
+@@ -1,6 +1,6 @@
+ // import { deleteDB } from 'idb';
+-import { data as charDB } from '$lib/data/characters.json';
+-import { data as wpDB } from '$lib/data/weapons.json';
++import { data as charDB } from '$lib/data/characters.js';
++import { data as wpDB } from '$lib/data/weapons.js';
+ import { BannerManager, HistoryManager } from '../dataAPI/api-indexeddb';
+ import { cookie } from '../dataAPI/api-cookie';
+ import { localConfig } from '../dataAPI/api-localstore';
+diff --git a/src/lib/helpers/placeholder-items.js b/src/lib/helpers/placeholder-items.js
+new file mode 100644
+index 0000000..53e8782
+--- /dev/null
++++ b/src/lib/helpers/placeholder-items.js
+@@ -0,0 +1,17 @@
++import { ITEMS } from '$lib/data/birthday-config';
++
++const COLORS = { 5: ['#f6d58a', '#b8763a'], 4: ['#d2a8f2', '#6b47a8'], 3: ['#a9c9f0', '#4a72b0'] };
++
++// Simple generated picture used until you set a real `image` for an item
++const placeholder = ({ name, rarity }) => {
++	const [c1, c2] = COLORS[rarity] || COLORS[3];
++	const slot = name.replace('birthday-item-', '#');
++	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="512" height="512" rx="48" fill="url(#g)"/><text x="256" y="230" font-size="64" text-anchor="middle" fill="#fff" font-family="serif">ITEM ${slot}</text><text x="256" y="300" font-size="44" text-anchor="middle" fill="#fff" font-family="serif">${'★'.repeat(rarity)}</text><text x="256" y="360" font-size="28" text-anchor="middle" fill="#fff" font-family="sans-serif">add image</text></svg>`;
++	return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
++};
++
++export const birthdayItemImages = () => {
++	const list = {};
++	ITEMS.forEach((item) => (list[item.name] = item.image || placeholder(item)));
++	return list;
++};
+diff --git a/src/locales/de-DE.json b/src/locales/de-DE.json
+index 31617f0..fdc0c7e 100644
+--- a/src/locales/de-DE.json
++++ b/src/locales/de-DE.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Genshin Impact Gebets-Simulator",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Charakter",
+ 	"weapon": "Waffe",
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 349075d..6544121 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Genshin Impact Wish Simulator",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Character",
+ 	"weapon": "Weapon",
+diff --git a/src/locales/fr-FR.json b/src/locales/fr-FR.json
+index c96a738..09012a0 100644
+--- a/src/locales/fr-FR.json
++++ b/src/locales/fr-FR.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Simulateur de vœux Genshin Impact",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Personnage",
+ 	"weapon": "Arme",
+diff --git a/src/locales/id-ID.json b/src/locales/id-ID.json
+index ffdd5e9..a772feb 100644
+--- a/src/locales/id-ID.json
++++ b/src/locales/id-ID.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Simulator Permohonan Genshin Impact",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Karakter",
+ 	"weapon": "Senjata",
+diff --git a/src/locales/it-IT.json b/src/locales/it-IT.json
+index 590e454..b27b2dc 100644
+--- a/src/locales/it-IT.json
++++ b/src/locales/it-IT.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Genshin Impact Wish Simulator",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Oggetto",
+ 	"character": "Personaggio",
+ 	"weapon": "Arma",
+diff --git a/src/locales/ja-JP.json b/src/locales/ja-JP.json
+index 13ef04e..58178ce 100644
+--- a/src/locales/ja-JP.json
++++ b/src/locales/ja-JP.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "原神祈願シミュ",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "アイテム",
+ 	"character": "キャラクター",
+ 	"weapon": "武器",
+diff --git a/src/locales/ko-KR.json b/src/locales/ko-KR.json
+index c53967a..97e868f 100644
+--- a/src/locales/ko-KR.json
++++ b/src/locales/ko-KR.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "원신 기원 시뮬레이터",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "아이템",
+ 	"character": "캐릭터",
+ 	"weapon": "무기",
+diff --git a/src/locales/pt-BR.json b/src/locales/pt-BR.json
+index 61b270e..f76b185 100644
+--- a/src/locales/pt-BR.json
++++ b/src/locales/pt-BR.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Simulador De Orações Do Genshin Impact",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Personagem",
+ 	"weapon": "Arma",
+diff --git a/src/locales/ru-RU.json b/src/locales/ru-RU.json
+index d81bb4a..b21dba2 100644
+--- a/src/locales/ru-RU.json
++++ b/src/locales/ru-RU.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Симулятор молитв Genshin Impact",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Предмет",
+ 	"character": "персонажей",
+ 	"weapon": "Оружие",
+diff --git a/src/locales/th-TH.json b/src/locales/th-TH.json
+index fde32fd..1e0cfb3 100644
+--- a/src/locales/th-TH.json
++++ b/src/locales/th-TH.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Genshin Impact Wish Simulator",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "สิ่งของ",
+ 	"character": "ตัวละคร",
+ 	"weapon": "อาวุธ",
+diff --git a/src/locales/vi-VN.json b/src/locales/vi-VN.json
+index 5c3ebdb..db9acd1 100644
+--- a/src/locales/vi-VN.json
++++ b/src/locales/vi-VN.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "Giả Lập Cầu Nguyện Genshin Impact",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "Item",
+ 	"character": "Nhân Vật",
+ 	"weapon": "Vũ Khí",
+diff --git a/src/locales/zh-CN.json b/src/locales/zh-CN.json
+index 871594a..605625c 100644
+--- a/src/locales/zh-CN.json
++++ b/src/locales/zh-CN.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "原神祈愿模拟器",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "物品",
+ 	"character": "角色",
+ 	"weapon": "武器",
+diff --git a/src/locales/zh-TW.json b/src/locales/zh-TW.json
+index 40714f3..bcccb9c 100644
+--- a/src/locales/zh-TW.json
++++ b/src/locales/zh-TW.json
+@@ -1,5 +1,5 @@
+ {
+-	"title": "原神祈願模擬器",
++	"title": "Happy Birthday Ericka!",
+ 	"item": "物品",
+ 	"character": "角色",
+ 	"weapon": "武器",
+diff --git a/src/routes/+layout.svelte b/src/routes/+layout.svelte
+index ec3342b..cae261b 100644
+--- a/src/routes/+layout.svelte
++++ b/src/routes/+layout.svelte
+@@ -26,7 +26,6 @@
+ 	// import { initializeDriveAPI } from '$lib/helpers/dataAPI/google-api';
+ 	import '../app.css';
+ 
+-	import Iklan from '$lib/components/Iklan.svelte';
+ 	import Toasts from '$lib/components/Toasts.svelte';
+ 	import Loader from './_index/InitialLoader.svelte';
+ 
+@@ -158,7 +157,6 @@
+ 		<link rel="manifest" href="/appmanifest.json" />
+ 	{/if}
+ 
+-	<Iklan head />
+ </svelte:head>
+ 
+ <Loader {isBannerLoaded} {directLoad} />
+@@ -177,14 +175,6 @@
+ 	{#if !$isLoading && isloaded}
+ 		<slot />
+ 	{/if}
+-	<a
+-		href="/"
+-		on:click|preventDefault={() => window.location.replace('/')}
+-		class="uid"
+-		title="Try Your Luck by this Simulator"
+-	>
+-		WishSimulator.App
+-	</a>
+ </main>
+ 
+ <style global>
+diff --git a/src/routes/_gachainfo/_book-bg.svelte b/src/routes/_gachainfo/_book-bg.svelte
+index 1126d39..dec195a 100644
+--- a/src/routes/_gachainfo/_book-bg.svelte
++++ b/src/routes/_gachainfo/_book-bg.svelte
+@@ -20,7 +20,6 @@
+ 	<slot />
+ {:else}
+ 	<div class="content-container" transition:customFLy={{ y: 25, tpl: tplVersion }}>
+-		<button class="old" on:click={() => setTpl('v1')}> {$t('history.olderLayout')}</button>
+ 		<div class="wrapper">
+ 			<div
+ 				class="book"
+diff --git a/src/routes/_gachainfo/details/_promotional-v2.svelte b/src/routes/_gachainfo/details/_promotional-v2.svelte
+index 30c5a97..0aeb581 100644
+--- a/src/routes/_gachainfo/details/_promotional-v2.svelte
++++ b/src/routes/_gachainfo/details/_promotional-v2.svelte
+@@ -3,7 +3,6 @@
+ 	import { assets, customData, isCustomBanner } from '$lib/store/app-stores';
+ 	import { getName } from '$lib/helpers/nameText';
+ 	import { lazyLoad } from '$lib/helpers/lazyload';
+-	import Iklan from '$lib/components/Iklan.svelte';
+ 
+ 	export let chronicledList = [];
+ 	export let data = {};
+@@ -92,7 +91,6 @@
+ 		{/if}
+ 	</div>
+ 
+-	<Iklan type="banner" />
+ 
+ 	<!-- 4 Star Item -->
+ 	<h3 class="star4">
+diff --git a/src/routes/_gachainfo/history/History.svelte b/src/routes/_gachainfo/history/History.svelte
+index fb78181..c5fc5be 100644
+--- a/src/routes/_gachainfo/history/History.svelte
++++ b/src/routes/_gachainfo/history/History.svelte
+@@ -9,7 +9,6 @@
+ 	import { localPity } from '$lib/helpers/dataAPI/api-localstore';
+ 
+ 	// Components
+-	import Iklan from '$lib/components/Iklan.svelte';
+ 	import SelectBanner from './_select-banner.svelte';
+ 	import Reset from './_reset.svelte';
+ 	import Report from './_report.svelte';
+@@ -81,13 +80,11 @@
+ 	<SelectBanner v2 {banner} />
+ 	<div class="container" bind:this={container}>
+ 		<div class="wrapper">
+-			<p class="v2">{$t('history.disclaimer')}</p>
+ 			<div class="row">
+ 				<Report {dataLength} v2 />
+ 				<Filter {filterBy} v2 />
+ 			</div>
+ 			<List v2 {banner} filter={filterBy} page={{ activepage, itemPerPage }} />
+-			<Iklan type="banner" />
+ 		</div>
+ 	</div>
+ 	<Legends {banner} v2 />
+@@ -96,7 +93,6 @@
+ 	<!-- Old Layout -->
+ {:else}
+ 	<SelectBanner {banner} />
+-	<p>{$t('history.disclaimer')}</p>
+ 
+ 	<div class="info">
+ 		<div class="left">
+diff --git a/src/routes/_gachainfo/history/_report.svelte b/src/routes/_gachainfo/history/_report.svelte
+index 6e7ec36..51691ca 100644
+--- a/src/routes/_gachainfo/history/_report.svelte
++++ b/src/routes/_gachainfo/history/_report.svelte
+@@ -28,8 +28,6 @@
+ 				<Icon type="primogem" />
+ 			</strong>
+ 		</span>
+-		<br />
+-		Est. <span class="lighted"> <strong> {totalSpend} </strong> </span>
+ 	</div>
+ {:else}
+ 	{$t('history.currentPity')} &nbsp; <strong class="star5"> {$pity5} </strong> &nbsp; - &nbsp;
+@@ -44,8 +42,6 @@
+ 			<Icon type="primogem" />
+ 		</strong>
+ 	</span>
+-	~
+-	<span class="lighted"> <strong> {totalSpend} </strong> </span>
+ {/if}
+ 
+ <style>
+diff --git a/src/routes/_index/InitialLoader.svelte b/src/routes/_index/InitialLoader.svelte
+index 98600b6..23cd198 100644
+--- a/src/routes/_index/InitialLoader.svelte
++++ b/src/routes/_index/InitialLoader.svelte
+@@ -3,6 +3,7 @@
+ 	import { fade } from 'svelte/transition';
+ 	import { mobileMode, isMobile, assets } from '$lib/store/app-stores';
+ 	import { itemList, listingAssets, blobAssets } from '$lib/helpers/assets';
++	import { birthdayItemImages } from '$lib/helpers/placeholder-items';
+ 
+ 	export let isBannerLoaded = false;
+ 	export let directLoad = false;
+@@ -36,7 +37,7 @@
+ 		assets.update((pv) => {
+ 			pv = {};
+ 			loadedAssets.forEach(({ url, name }) => (pv[name] = url));
+-			return { ...pv, ...list };
++			return { ...pv, ...birthdayItemImages(), ...list };
+ 		});
+ 
+ 		if (anyError === false) handleLoaded();
+diff --git a/src/routes/_index/ModalWelcome.svelte b/src/routes/_index/ModalWelcome.svelte
+index d7e1eb8..b726067 100644
+--- a/src/routes/_index/ModalWelcome.svelte
++++ b/src/routes/_index/ModalWelcome.svelte
+@@ -1,174 +1,41 @@
+ <script>
+-	import { getContext, onMount } from 'svelte';
+-	import { t } from 'svelte-i18n';
+-	import OverlayScrollbars from 'overlayscrollbars';
+-
+-	import { data } from '$lib/data/updates.json';
+-	import { isPWA } from '$lib/store/app-stores';
+-	import { adKey, verifyKey } from '$lib/helpers/accessKey';
+-	import { browserDetect } from '$lib/helpers/mobileDetect';
++	import { getContext } from 'svelte';
+ 	import { playSfx } from '$lib/helpers/audio/audio';
++	import { WELCOME } from '$lib/data/birthday-config';
+ 	import Modal from '$lib/components/ModalTpl.svelte';
+ 
+-	let content;
+-	let contentHeight;
+-	let savedKey = '';
+-	let dateExpired = '';
+-
+ 	const startApp = getContext('startApp');
+-	const updates = data.filter(({ featured }) => !!featured);
+-
+-	onMount(async () => {
+-		OverlayScrollbars(content, { sizeAutoCapable: false, className: 'os-theme-light' });
+-		const { expiryDate, storedKey } = await adKey.initialLoad();
+-		dateExpired = expiryDate;
+-		savedKey = storedKey;
+-	});
+ 
+ 	const handleConfirm = () => {
+ 		playSfx();
+ 		startApp();
+-		verifyKey();
+ 	};
+ </script>
+ 
+-<Modal confirmOnly title={$t('title')} on:confirm={handleConfirm}>
+-	<section bind:clientHeight={contentHeight} style="--modalHeight:{contentHeight}px">
+-		<p class="sp">
+-			{$t('fanmade')} <br />
+-			{#if !$isPWA}
+-				<a href="/install">{$t('installInstruction')}</a>
+-			{/if}
+-		</p>
+-		{#if !browserDetect().isSupported && isPWA}
+-			<div class="updates adExpired">
+-				<strong>
+-					We highly recommend installing <span style="display: inline; color:#5ab3ff">
+-						Google Chrome
+-					</span>
+-					for optimal performance as some features may not be fully supported on.
+-				</strong>
+-			</div>
+-		{:else if dateExpired && dateExpired !== 'none'}
+-			<div class="updates adExpired">
+-				<div>
+-					{@html $t('menu.keyExpired2', {
+-						values: { key: `<b>${savedKey}</b>`, date: `<u>${dateExpired}</u>` }
+-					})}
+-					<a
+-						href="https://ko-fi.com/post/AdFree-Wish-Simulator-Enjoy-Simulator-Without-Ads-G2G2DQ57O"
+-						target="_blank"
+-					>
+-						{$t('menu.getNewKey')}
+-					</a>
+-				</div>
+-			</div>
+-		{:else}
+-			<div class="updates" bind:this={content}>
+-				{#each updates.reverse() as { description, date }, i (i)}
+-					<span>
+-						<i class="tgl"> {date} </i>
+-						{#if i === 0} ( Latest Update ) {/if}
+-					</span>
+-					{#each description as txt} <p>{@html txt}</p> {/each}
+-				{/each}
+-				<div style="height: .5rem" />
+-			</div>
+-		{/if}
+-		<p class="credit">{$t('disclaimer')}</p>
++<Modal confirmOnly on:confirm={handleConfirm}>
++	<section>
++		<!-- TODO(birthday): edit the text in src/lib/data/birthday-config.js (WELCOME). To change the layout or style, edit this file. -->
++		<h1 class="big">{WELCOME.heading}</h1>
++		<p class="message">{WELCOME.message}</p>
+ 	</section>
+ </Modal>
+ 
+ <style>
+ 	section {
+ 		width: 100%;
+-		height: 100%;
+-		padding: 0 1.5rem;
+-	}
+-	.credit {
+-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+-		font-size: 0.9rem;
+-	}
+-
+-	.updates {
+-		text-align: left;
+-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+-		background-color: #fff;
+-		font-size: 0.97rem;
+-		height: calc(0.7 * var(--modalHeight));
+-		padding: 0 1rem;
+-		display: block;
+-		overflow: hidden;
+-	}
+-
+-	:global(.mobile) .updates {
+-		height: calc(0.6 * var(--modalHeight));
+-	}
+-
+-	.adExpired {
++		padding: 2rem 1.5rem;
+ 		text-align: center;
+-		font-size: 125%;
+-		display: flex;
+-		justify-content: center;
+-		align-items: center;
+ 	}
+-
+-	.adExpired a {
+-		display: block;
+-		margin-top: 1rem;
+-	}
+-
+-	.updates span {
+-		font-weight: bold;
+-		color: #f7cf33;
+-		display: block;
+-		padding-top: 0.5rem;
+-	}
+-	.updates .tgl {
++	.big {
++		font-size: 4.5rem;
++		line-height: 110%;
++		margin: 0 0 1rem;
+ 		color: #bd6932;
+ 	}
+-
+-	.updates :global(a) {
+-		color: #f29f0f;
+-	}
+-	.updates :global(a:hover) {
+-		text-decoration: underline;
+-	}
+-
+-	.updates p {
+-		padding-left: 1rem;
+-		position: relative;
+-		line-height: 1rem;
+-		margin: 0.5rem 0;
+-	}
+-	.updates p::before {
+-		content: '*';
+-		display: inline-block;
+-		width: 10px;
+-		line-height: 0;
+-		font-size: 1.3rem;
+-		padding-top: 0.5rem;
+-		position: absolute;
+-		left: 0;
+-		top: 50%;
+-		transform: translateY(-50%);
++	.message {
++		font-size: 1.4rem;
+ 	}
+-
+-	.sp {
+-		font-size: 0.9rem;
+-		padding: 0rem 0 0.5rem;
+-	}
+-
+-	a {
+-		transition: all 0.2s;
+-	}
+-	.sp a {
+-		font-weight: bold;
+-		color: #e3a023;
+-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+-	}
+-
+-	a:active {
+-		transform: scale(0.9);
++	:global(.mobile) .big {
++		font-size: 2.8rem;
+ 	}
+ </style>
+diff --git a/src/routes/_index/ScreenshotShare.svelte b/src/routes/_index/ScreenshotShare.svelte
+index a19d2e3..7ee3327 100644
+--- a/src/routes/_index/ScreenshotShare.svelte
++++ b/src/routes/_index/ScreenshotShare.svelte
+@@ -22,7 +22,7 @@
+ 	let btnTxt = canshare ? $t('share') : $t('screenshot');
+ 
+ 	let obtainScreen = false;
+-	let isFirstTimeShare = !localConfig.get('firstTimeShare');
++	let isFirstTimeShare = false; // birthday version: no free share reward
+ 
+ 	setContext('firsTimeShare', () => {
+ 		isFirstTimeShare = false;
+diff --git a/src/routes/_index/_screenshot-result.svelte b/src/routes/_index/_screenshot-result.svelte
+index 7b275bb..a5a738b 100644
+--- a/src/routes/_index/_screenshot-result.svelte
++++ b/src/routes/_index/_screenshot-result.svelte
+@@ -14,7 +14,7 @@
+ 	export let blob;
+ 
+ 	$: shareLink = shareURL || window.location.origin;
+-	let shareText = 'Come and try this Genshin Impact Wish Simulator!';
++	let shareText = 'Happy Birthday Ericka!';
+ 	let showToast = false;
+ 
+ 	const closeShot = getContext('closeShot');
+diff --git a/src/routes/_inventory/_footer.svelte b/src/routes/_inventory/_footer.svelte
+index 1b7c19f..c03f009 100644
+--- a/src/routes/_inventory/_footer.svelte
++++ b/src/routes/_inventory/_footer.svelte
+@@ -1,8 +1,8 @@
+ <script>
+ 	import { getContext, onMount, setContext } from 'svelte';
+ 	import { t } from 'svelte-i18n';
+-	import { data as charDB } from '$lib/data/characters.json';
+-	import { data as weaponDB } from '$lib/data/weapons.json';
++	import { data as charDB } from '$lib/data/characters.js';
++	import { data as weaponDB } from '$lib/data/weapons.js';
+ 	import { cookie } from '$lib/helpers/dataAPI/api-cookie';
+ 	import { owneditem } from '$lib/helpers/dataAPI/api-localstore';
+ 	import { BannerManager } from '$lib/helpers/dataAPI/api-indexeddb';
+diff --git a/src/routes/_menu/Settings.svelte b/src/routes/_menu/Settings.svelte
+index 38cf321..3f4b15f 100644
+--- a/src/routes/_menu/Settings.svelte
++++ b/src/routes/_menu/Settings.svelte
+@@ -155,25 +155,6 @@
+ 		{$t('menu.currency')}
+ 	</OptionMenu>
+ 
+-	<OptionMenu
+-		name="wishAmount"
+-		showOption={optionToShow === 'wishAmount'}
+-		activeIndicator={selectedAmount}
+-		on:select={handleSelectAmount}
+-	>
+-		{$t('menu.fates')}
+-	</OptionMenu>
+-
+-	{#each ['intertwined', 'acquaint', 'starglitter', 'stardust', 'primogem'] as item, i}
+-		{#if selectedAmount === 'manual'}
+-			<div in:fly|local={{ y: -10, delay: Math.sqrt(i * 10000) }} out:fly|local={{ y: -10 }}>
+-				<OptionMenu useInput sub inputValue={item} name="currencyItem">
+-					<Icon type={item} style="margin: -1% 2% -1% 0" />
+-					{$t(`shop.item.${item}`)}
+-				</OptionMenu>
+-			</div>
+-		{/if}
+-	{/each}
+ 
+ 	<OptionMenu name="multi" inputValue={$multipull} useInput>{$t('menu.multiRoll')}</OptionMenu>
+ 
+diff --git a/src/routes/_menu/_sidebar.svelte b/src/routes/_menu/_sidebar.svelte
+index 197a7f2..8e7d5ed 100644
+--- a/src/routes/_menu/_sidebar.svelte
++++ b/src/routes/_menu/_sidebar.svelte
+@@ -13,25 +13,6 @@
+ 			<button on:click={() => selectMenu('options')}> {$t('menu.options')} </button>
+ 		</div>
+ 
+-		<div class="menu-item" class:active={activeContent === 'customBanner'}>
+-			<button on:click={() => selectMenu('customBanner')}> {$t('menu.customBanner')} </button>
+-		</div>
+-
+-		<div class="menu-item" class:active={activeContent === 'proAccess'}>
+-			<button on:click={() => selectMenu('proAccess')}> {$t('menu.proAccess')} </button>
+-		</div>
+-
+-		<div class="menu-item" class:active={activeContent === 'updates'}>
+-			<button on:click={() => selectMenu('updates')}> {$t('menu.updates')} </button>
+-		</div>
+-
+-		<div class="menu-item" class:active={activeContent === 'backupRestore'}>
+-			<button on:click={() => selectMenu('backupRestore')}> {$t('menu.backupRestore')} </button>
+-		</div>
+-
+-		<div class="menu-item">
+-			<button on:click={chatToggle}> {$t('menu.feedback')} </button>
+-		</div>
+ 	</div>
+ </div>
+ 
+diff --git a/src/routes/_shop/_aside.svelte b/src/routes/_shop/_aside.svelte
+index 208cecb..ef70cab 100644
+--- a/src/routes/_shop/_aside.svelte
++++ b/src/routes/_shop/_aside.svelte
+@@ -44,43 +44,6 @@
+ >
+ 	<div class="top">{$t('shop.text')}</div>
+ 	<div class="nav-item">
+-		<button
+-			class="link"
+-			class:active={activeShop === 'recomended'}
+-			on:click={() => selectShop('recomended')}
+-		>
+-			{#if hasNewOutfits}
+-				<NoticeMark name="recomended-{patch}" />
+-			{/if}
+-			<span>
+-				<i class="gi-recomended" />
+-				{$t('shop.recomendedHeading')}
+-			</span>
+-		</button>
+-
+-		{#if $outfits.length > 0}
+-			<button
+-				class="link"
+-				class:active={activeShop === 'outfits'}
+-				on:click|preventDefault={() => selectShop('outfits')}
+-			>
+-				{#if hasNewOutfits}
+-					<NoticeMark name="outfits-{patch}" />
+-				{/if}
+-				<span><i class="gi-outfit" /> {$t('outfit.heading')}</span>
+-			</button>
+-		{/if}
+-
+-		<button
+-			class="link"
+-			class:active={activeShop === 'paimon-bargains'}
+-			on:click={() => selectShop('paimon-bargains')}
+-		>
+-			<span>
+-				<i class="gi-paimon-bargains" />
+-				{$t('shop.paimonHeading')}
+-			</span>
+-		</button>
+ 		<button
+ 			class="link"
+ 			class:active={activeShop === 'genesis'}
+@@ -91,16 +54,6 @@
+ 				{$t('shop.crystalTopup')}
+ 			</span>
+ 		</button>
+-		<button
+-			class="link"
+-			class:active={activeShop === 'donate'}
+-			on:click={() => selectShop('donate')}
+-		>
+-			<span>
+-				<i class="gi-companion" />
+-				{$t('donate')}
+-			</span>
+-		</button>
+ 	</div>
+ </aside>
+ 
+diff --git a/src/routes/_shop/_header.svelte b/src/routes/_shop/_header.svelte
+index 54ae82b..97e74c8 100644
+--- a/src/routes/_shop/_header.svelte
++++ b/src/routes/_shop/_header.svelte
+@@ -45,11 +45,6 @@
+ 				<span />
+ 			</button>
+ 		{/if}
+-		{#if activeShop === 'donate'}
+-			<span> Thank you for every donation you have given to me, I realy appreciate it.</span>
+-		{:else}
+-			<span> {$t('shop.noLimitTime')} </span>
+-		{/if}
+ 	</div>
+ 	<div class="fates">
+ 		{#if ['genesis', 'outfits', 'recomended'].includes(activeShop)}
+diff --git a/src/routes/_shop/genesis-topup/GenesisTopup.svelte b/src/routes/_shop/genesis-topup/GenesisTopup.svelte
+index 424c59c..fddf146 100644
+--- a/src/routes/_shop/genesis-topup/GenesisTopup.svelte
++++ b/src/routes/_shop/genesis-topup/GenesisTopup.svelte
+@@ -15,10 +15,8 @@
+ 	import ModalTopup from './_modal-topup.svelte';
+ 	import CheckBox from '$lib/components/CheckBox.svelte';
+ 
+-	const checkCookie = cookie.get('initialTopup');
+-	let initialTopup = checkCookie === undefined ? true : checkCookie;
+-	const initialCheck = ({ detail }) => (initialTopup = !!detail?.checked);
+-	$: cookie.set('initialTopup', initialTopup);
++	// Birthday version: no initial top-up bonus
++	const initialTopup = false;
+ 
+ 	const { versionReset, topupBonus } = genesisBonus;
+ 	const localTopup = localConfig.get('topupBonus') || {};
+@@ -120,11 +118,6 @@
+ 	{/each}
+ </ShopGroup>
+ 
+-<CheckBox checked={initialTopup} on:change={initialCheck}>
+-	<span style="color: var(--tertiary-color);">
+-		{$t('shop.initialBonus')}
+-	</span>
+-</CheckBox>
+ 
+ <style>
+ 	button {
+diff --git a/src/routes/_shop/index.svelte b/src/routes/_shop/index.svelte
+index 963a95b..80d5d6e 100644
+--- a/src/routes/_shop/index.svelte
++++ b/src/routes/_shop/index.svelte
+@@ -18,10 +18,6 @@
+ 	import Aside from './_aside.svelte';
+ 	import ModalExchange from './_modal-exchange.svelte';
+ 	import GenesisTopup from './genesis-topup/GenesisTopup.svelte';
+-	import PaimonBargains from './paimon-bargains/PaimonBargains.svelte';
+-	import Donate from './donate/Donate.svelte';
+-	import Recomended from './recomended/Recomended.svelte';
+-	import CharacterOutfits from './character-outfit/CharacterOutfits.svelte';
+ 	import WishResult from '../_wish/wish-result/WishResult.svelte';
+ 
+ 	$: title = $t('title', { default: APP_TITLE });
+@@ -121,17 +117,7 @@
+ </script>
+ 
+ <svelte:head>
+-	{#if activeShop === 'genesis'}
+-		<title>{$t('shop.buyGenesisHeading')} | {title}</title>
+-	{:else if activeShop === 'recomended'}
+-		<title>{$t('shop.recomendedHeading')} | {title}</title>
+-	{:else if activeShop === 'outfits'}
+-		<title>{$t('outfit.heading')} | {title}</title>
+-	{:else if activeShop === 'donate'}
+-		<title>Donate | {title}</title>
+-	{:else}
+-		<title>{$t('shop.paimonHeading')} | {title}</title>
+-	{/if}
++	<title>{$t('shop.buyGenesisHeading')} | {title}</title>
+ </svelte:head>
+ 
+ <!-- outfit Splash Art -->
+@@ -160,26 +146,7 @@
+ 				bind:clientHeight={contentHeight}
+ 				style="--content-height:{contentHeight}px"
+ 			>
+-				{#if activeShop === 'genesis'}
+-					<GenesisTopup />
+-
+-					<!-- Recomended Item -->
+-				{:else if activeShop === 'recomended'}
+-					<!-- <Recomended {recentlyBuyIndex} /> -->
+-					<Recomended />
+-
+-					<!-- Characters Outfits -->
+-				{:else if activeShop === 'outfits'}
+-					<CharacterOutfits />
+-
+-					<!-- Donate -->
+-				{:else if activeShop === 'donate'}
+-					<Donate />
+-
+-					<!-- Paimon Bargains -->
+-				{:else if activeShop === 'paimon-bargains'}
+-					<PaimonBargains />
+-				{/if}
++				<GenesisTopup />
+ 			</div>
+ 		</div>
+ 	</div>
+diff --git a/src/routes/_wish/_banner-button.svelte b/src/routes/_wish/_banner-button.svelte
+index 915b64f..3278e69 100644
+--- a/src/routes/_wish/_banner-button.svelte
++++ b/src/routes/_wish/_banner-button.svelte
+@@ -12,6 +12,7 @@
+ 	export let featured = [];
+ 	export let character = '';
+ 	export let index = 0;
++	export let buttonImage = '';
+ 
+ 	const buttonOffset = (itemName, buttonPosition = {}) => {
+ 		const getDetails = type === 'weapon-event' ? getWpDetails : getCharDetails;
+@@ -71,7 +72,7 @@
+ 				<img
+ 					in:fade
+ 					on:error={(e) => e.target.remove()}
+-					src={$assets[`button/${character}`]}
++					src={buttonImage || $assets[`button/${character}`]}
+ 					style={positionToStyle(buttonOffset(character))}
+ 					alt="{type} Wish"
+ 					crossorigin="anonymous"
+diff --git a/src/routes/_wish/_header.svelte b/src/routes/_wish/_header.svelte
+index 7d2f672..1201673 100644
+--- a/src/routes/_wish/_header.svelte
++++ b/src/routes/_wish/_header.svelte
+@@ -47,10 +47,8 @@
+ 	const chatToggle = getContext('chatToggle');
+ 	const navigate = getContext('navigate');
+ 
+-	const previousClick = () => {
+-		navigate('allbanners');
+-		playSfx();
+-	};
++	// Birthday version: there is no 'all banners' page anymore
++	const previousClick = () => {};
+ 
+ 	const handleMenu = getContext('handleMenu');
+ 	$: headerHeightstyle = $mobileMode ? `height: ${$viewportHeight}px` : '';
+@@ -98,9 +96,6 @@
+ 			<button class="help" on:click={handleMenu} title="Setting" aria-label="Setting">
+ 				<i class="gi-help" />
+ 			</button>
+-			<button class="chat" on:click={chatToggle} title="Chats" aria-label="Chats">
+-				<i class="gi-chat" />
+-			</button>
+ 
+ 			{#if !$isPWA || !$isMobile}
+ 				<button
+@@ -133,9 +128,6 @@
+ 					</MyFund>
+ 				</div>
+ 
+-				<button class="close" on:click={previousClick} title="Change Banner">
+-					<i class="gi-close" />
+-				</button>
+ 			{:else}
+ 				<button
+ 					class="close"
+@@ -158,9 +150,10 @@
+ 			</div>
+ 
+ 			<div class="button-wrapper" style={$bannerList.length > 5 ? 'flex-wrap: wrap' : ''}>
+-				{#each $bannerList as { type, featured, character, region }, i}
++				{#each $bannerList as { type, featured, character, region, buttonImage }, i}
+ 					<BannerButton
+ 						{type}
++						{buttonImage}
+ 						{character}
+ 						index={i}
+ 						featured={featured || region}
+diff --git a/src/routes/_wish/banner-card/BannerCard.svelte b/src/routes/_wish/banner-card/BannerCard.svelte
+index 999c4d2..490663a 100644
+--- a/src/routes/_wish/banner-card/BannerCard.svelte
++++ b/src/routes/_wish/banner-card/BannerCard.svelte
+@@ -10,6 +10,7 @@
+ 	import FrameWeapon from './_frame-weapon.svelte';
+ 	import FrameStandard from './_frame-standard.svelte';
+ 	import FrameCustom from './_frame-custom.svelte';
++	import FrameBirthday from './_frame-birthday.svelte';
+ 	import BannerImage from './_banner-image.svelte';
+ 	import ProbEditor from './_probability-editor.svelte';
+ 	import ChronicledSpace from './_chronicled/bannerSpace.svelte';
+@@ -65,8 +66,12 @@
+ 		{/if}
+ 	</div>
+ 	<div class="front">
+-		<!-- Custom Banner -->
+-		{#if $isCustomBanner}
++		<!-- Birthday Banner (see birthday-config.js) -->
++		{#if data.birthday}
++			<FrameBirthday {data} />
++
++			<!-- Custom Banner -->
++		{:else if $isCustomBanner}
+ 			<BannerImage
+ 				custom
+ 				src={images?.artURL}
+@@ -145,10 +150,6 @@
+ 		{/if}
+ 
+ 		<div class="info">
+-			<button class="detail" on:click={openDetails}> {$t('details.text')} </button>
+-			{#if type !== 'beginner'}
+-				<button class="gear" on:click={openRateEditor}><i class="gi-gear" /></button>
+-			{/if}
+ 		</div>
+ 	</div>
+ </div>
+diff --git a/src/routes/_wish/banner-card/_frame-birthday.svelte b/src/routes/_wish/banner-card/_frame-birthday.svelte
+new file mode 100644
+index 0000000..2110db5
+--- /dev/null
++++ b/src/routes/_wish/banner-card/_frame-birthday.svelte
+@@ -0,0 +1,78 @@
++<script>
++	import { ITEMS } from '$lib/data/birthday-config';
++
++	// Banner info is edited in src/lib/data/birthday-config.js (BANNERS)
++	export let data = {};
++
++	$: featured = (data.featuredIds || [])
++		.map((id) => ITEMS.find(({ name }) => name === id))
++		.filter(Boolean);
++</script>
++
++<div class="bday" style={data.image ? `background-image: url(${data.image})` : ''}>
++	<div class="shade">
++		<div class="tag">{data.tag}</div>
++		<h1>{data.title}</h1>
++		{#if data.subtitle}<h2>{data.subtitle}</h2>{/if}
++		<div class="desc">
++			{#each data.description || [] as line}<p>{line}</p>{/each}
++		</div>
++		<ul class="featured">
++			{#each featured as item (item.name)}
++				<li><span class="stars">{'★'.repeat(item.rarity)}</span> {item.label}</li>
++			{/each}
++		</ul>
++	</div>
++</div>
++
++<style>
++	.bday {
++		position: relative;
++		width: 100%;
++		aspect-ratio: 1080 / 533;
++		background: radial-gradient(circle at 70% 30%, #4a4f8f, #1a1f3d 70%);
++		background-size: cover;
++		background-position: center;
++		color: #fff;
++		overflow: hidden;
++	}
++	.shade {
++		position: absolute;
++		inset: 0;
++		padding: 4% 5%;
++		background: linear-gradient(90deg, rgba(13, 17, 36, 0.75), rgba(13, 17, 36, 0.05) 75%);
++		font-size: calc(1.8 / 100 * var(--content-width, 1000px));
++		line-height: 130%;
++	}
++	.tag {
++		display: inline-block;
++		padding: 0.1em 0.8em;
++		background: #f3d082;
++		color: #3b2a0c;
++		border-radius: 1em;
++		font-size: 90%;
++	}
++	h1 {
++		font-size: 300%;
++		line-height: 110%;
++		margin: 0.2em 0;
++		color: #f3d082;
++		text-shadow: 0 0 12px rgba(243, 208, 130, 0.7);
++	}
++	h2 {
++		font-size: 130%;
++		margin: 0;
++	}
++	.desc {
++		max-width: 55%;
++		margin-top: 0.6em;
++	}
++	.featured {
++		margin-top: 0.8em;
++		list-style: none;
++		padding: 0;
++	}
++	.stars {
++		color: #f3d082;
++	}
++</style>
+diff --git a/src/routes/_wish/index.svelte b/src/routes/_wish/index.svelte
+index 12fc2f9..c1b05eb 100644
+--- a/src/routes/_wish/index.svelte
++++ b/src/routes/_wish/index.svelte
+@@ -18,6 +18,7 @@
+ 	import { APP_TITLE } from '$lib/env';
+ 	import { playSfx } from '$lib/helpers/audio/audio';
+ 	import WISH, { roll } from '$lib/helpers/gacha/Wish';
++	import { GUARANTEE_5_STAR_ON_TEN_PULL } from '$lib/data/birthday-config';
+ 
+ 	// Components
+ 	import Header from './_header.svelte';
+@@ -75,7 +76,10 @@
+ 		onWish.set(true);
+ 
+ 		for (let i = 0; i < count; i++) {
+-			const result = await roll(bannerToRoll, WishInstance, indexOfCharBanner);
++			// Birthday rule: a x10 pull always ends with a 5-star if none dropped yet
++			const isLast = i === count - 1;
++			const need5 = GUARANTEE_5_STAR_ON_TEN_PULL && count > 1 && isLast && !tmp.some((r) => r.rarity === 5);
++			const result = await roll(bannerToRoll, WishInstance, indexOfCharBanner, need5 ? 5 : null);
+ 			tmp.push(result);
+ 		}
+ 
+diff --git a/src/routes/_wish/wish-result/WishResult.svelte b/src/routes/_wish/wish-result/WishResult.svelte
+index 425e490..9e99670 100644
+--- a/src/routes/_wish/wish-result/WishResult.svelte
++++ b/src/routes/_wish/wish-result/WishResult.svelte
+@@ -130,7 +130,6 @@
+ 	out:fade={{ duration: 250 }}
+ >
+ 	<!-- Preview Only -->
+-	<div class="uid">WishSimulator.App</div>
+ 	<img
+ 		src={$assets[`genshin-logo${isYuanshen ? '-cn' : ''}.webp`]}
+ 		alt="genshin logo"
+diff --git a/src/routes/adkey/+page.svelte b/src/routes/adkey/+page.svelte
+index f04fbba..538ab12 100644
+--- a/src/routes/adkey/+page.svelte
++++ b/src/routes/adkey/+page.svelte
+@@ -46,7 +46,7 @@
+ </script>
+ 
+ <svelte:head>
+-	<title>Genshin Impact Wish Simulator</title>
++	<title>Happy Birthday Ericka!</title>
+ </svelte:head>
+ 
+ <section in:fly={{ x: -200, duration: 200 }}>
+@@ -58,7 +58,7 @@
+ 		<i class="gi-primo-star bottom-right" />
+ 		<i class="gi-inazuma icon-bg" />
+ 
+-		<h1>Genshin Impact Wish Simulator</h1>
++		<h1>Happy Birthday Ericka!</h1>
+ 		<h2>This Page is only available for supporters.</h2>
+ 
+ 		<form class="form" on:submit|preventDefault={requestAccess}>
+diff --git a/src/routes/privacy-policy/+page.svelte b/src/routes/privacy-policy/+page.svelte
+index 3f96d38..f21ac74 100644
+--- a/src/routes/privacy-policy/+page.svelte
++++ b/src/routes/privacy-policy/+page.svelte
+@@ -13,7 +13,7 @@
+ <section>
+ 	<header>
+ 		<h1>Privacy Policy for WishSimulator.App</h1>
+-		<h2>Genshin Impact Wish Simulator</h2>
++		<h2>Happy Birthday Ericka!</h2>
+ 	</header>
+ 
+ 	<article>
+diff --git a/src/routes/screen/wishitem/+page.svelte b/src/routes/screen/wishitem/+page.svelte
+index 029d69b..5930c19 100644
+--- a/src/routes/screen/wishitem/+page.svelte
++++ b/src/routes/screen/wishitem/+page.svelte
+@@ -5,8 +5,8 @@
+ 	import { t } from 'svelte-i18n';
+ 
+ 	import { APP_TITLE } from '$lib/env';
+-	import { data as charDB } from '$lib/data/characters.json';
+-	import { data as weaponDB } from '$lib/data/weapons.json';
++	import { data as charDB } from '$lib/data/characters.js';
++	import { data as weaponDB } from '$lib/data/weapons.js';
+ 	import { decodeAndReadData } from '$lib/helpers/shareable-link';
+ 	import WishResult from '../../_wish/wish-result/WishResult.svelte';
+ 
+diff --git a/src/routes/screen/wishlist/+page.svelte b/src/routes/screen/wishlist/+page.svelte
+index 6b15515..3cb659a 100644
+--- a/src/routes/screen/wishlist/+page.svelte
++++ b/src/routes/screen/wishlist/+page.svelte
+@@ -3,8 +3,8 @@
+ 	import { goto } from '$app/navigation';
+ 	import { onMount } from 'svelte';
+ 
+-	import { data as charDB } from '$lib/data/characters.json';
+-	import { data as weaponDB } from '$lib/data/weapons.json';
++	import { data as charDB } from '$lib/data/characters.js';
++	import { data as weaponDB } from '$lib/data/weapons.js';
+ 	import { decodeAndReadData } from '$lib/helpers/shareable-link';
+ 	import WishResult from '../../_wish/wish-result/WishResult.svelte';
+ 
+diff --git a/static/banners/README.txt b/static/banners/README.txt
+new file mode 100644
+index 0000000..0f6b302
+--- /dev/null
++++ b/static/banners/README.txt
+@@ -0,0 +1 @@
++Put your banner pictures here, then set `image: '/banners/yourfile.jpg'` in src/lib/data/birthday-config.js (BANNERS).
+diff --git a/static/items/README.txt b/static/items/README.txt
+new file mode 100644
+index 0000000..4cc27ad
+--- /dev/null
++++ b/static/items/README.txt
+@@ -0,0 +1 @@
++Put your prize pictures here, then set `image: '/items/yourfile.png'` in src/lib/data/birthday-config.js (ITEMS).
