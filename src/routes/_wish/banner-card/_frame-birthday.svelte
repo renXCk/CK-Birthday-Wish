@@ -45,13 +45,18 @@
 	 */
 
 	const goldPositions = [
-		{ x: 24, y: 2, w: 59 }
+		{ x: 18, y: 5, w: 26 },
+		{ x: 62, y: 4, w: 27 },
+		{ x: 38, y: 34, w: 29 },
+		{ x: 10, y: 62, w: 26 },
+		{ x: 58, y: 65, w: 27 }
 	];
 
 	const bluePositions = [
-		{ x: -6, y: 0, w: 41 },   // upper-left
-		{ x: 68, y: 2, w: 39 },    // upper-right
-		{ x: 69, y: 58, w: 40 }   // lower-right
+		{ x: -2, y: 2, w: 21 },
+		{ x: 0, y: 36, w: 21 },
+		{ x: 82, y: 35, w: 22 },
+		{ x: 35, y: 74, w: 20 }
 	];
 
 	const positionStyle = (position) => `
@@ -131,6 +136,10 @@
 	<div class="streaks"></div>
 	<div class="panel"></div>
 
+	{#if data.tag}
+		<div class="event-tag">{data.tag}</div>
+	{/if}
+
 
 	<!-- ======================================================
 	     SPARKLES
@@ -158,7 +167,7 @@
 	<div class="text">
 
 		<h1 class:has-accent={data.titleAccent}>
-			{data.title}
+			<span class="title-main">{data.title}</span>
 
 			{#if data.titleAccent}
 				<span class="accent">
@@ -188,7 +197,7 @@
 			<div class="bar"></div>
 
 			<h3>
-				Probability increased
+				Probability increased!
 			</h3>
 
 			{#if highlight}
@@ -248,9 +257,12 @@
 					<!-- REVEALED BLUE ITEM -->
 					<div
 						class="slot blue revealed"
-						style={positionStyle(
-							bluePositions[i % bluePositions.length]
-						)}
+						style={`
+							${positionStyle(
+								bluePositions[i % bluePositions.length]
+							)}
+							animation-delay: ${(i * 0.75).toFixed(2)}s;
+						`}
 					>
 
 						<img
@@ -269,8 +281,8 @@
 							${positionStyle(
 								bluePositions[i % bluePositions.length]
 							)}
-
 							--orb-art: url("${data.mysteryArt?.fourStar || ''}");
+							animation-delay: ${(i * 0.75).toFixed(2)}s;
 						`}
 					>
 
@@ -301,9 +313,12 @@
 					<!-- REVEALED GOLD ITEM -->
 					<div
 						class="slot gold revealed"
-						style={positionStyle(
-							goldPositions[i % goldPositions.length]
-						)}
+						style={`
+							${positionStyle(
+								goldPositions[i % goldPositions.length]
+							)}
+							animation-delay: ${(i * 0.65).toFixed(2)}s;
+						`}
 					>
 
 						<img
@@ -322,8 +337,8 @@
 							${positionStyle(
 								goldPositions[i % goldPositions.length]
 							)}
-
 							--orb-art: url("${data.mysteryArt?.fiveStar || ''}");
+							animation-delay: ${(i * 0.65).toFixed(2)}s;
 						`}
 					>
 
@@ -405,14 +420,9 @@
 			★★★★★
 		</div>
 
-
-		{#if data.tag}
-
-			<div class="sub">
-				{data.tag}
-			</div>
-
-		{/if}
+		<div class="sub">
+			Something Cool
+		</div>
 
 	</div>
 
@@ -464,7 +474,6 @@
 		--panel: #473478;
 
 		--plate-dark: #33265f;
-		--plate-sub: #2a1f4f;
 		--plate-outline: #3a2a6b;
 
 		--emblem: #c3a6ff;
@@ -696,6 +705,33 @@
 	   LEFT TEXT
 	   ========================================================== */
 
+	.event-tag {
+
+		position: absolute;
+
+		top: 0;
+		left: 0;
+
+		z-index: 20;
+
+		padding: 0.55cqw 2.2cqw 0.55cqw 1.2cqw;
+
+		border-radius: 0 0.6cqw 0.6cqw 0;
+		clip-path: polygon(0 0, 100% 0, calc(100% - 1.1cqw) 100%, 0 100%);
+
+		background: linear-gradient(100deg, #7653b8, #9a73d4);
+
+		color: #fff;
+
+		font-size: 1.7cqw;
+
+		font-family: 'HYWenHei', 'GenshinDefaultJP', 'Segoe UI', Arial, sans-serif;
+
+		line-height: 1.2;
+
+		text-shadow: 0 0.1cqw 0.3cqw rgba(0, 0, 0, 0.35);
+	}
+
 	.text {
 
 		position: absolute;
@@ -718,11 +754,13 @@
 
 		margin: 0;
 
-		font-size: 4.2cqw;
+		font-size: 3.5cqw;
 
 		line-height: 1.12;
 
 		font-weight: 400;
+
+		font-family: 'HYWenHei', 'GenshinDefaultJP', 'Segoe UI', Arial, sans-serif;
 
 
 		color: var(--accent);
@@ -750,6 +788,13 @@
 				0 0.1cqw
 				rgba(255, 255, 255, 0.8)
 			);
+	}
+
+	.title-main {
+
+		display: block;
+
+		white-space: nowrap;
 	}
 
 
@@ -1259,41 +1304,21 @@
 		line-height: 1;
 	}
 
-
 	.sub {
 
-		margin:
-			0.4cqw
-			0
-			0
-			1cqw;
+		margin: 0.4cqw 0 0 1cqw;
 
-		padding:
-			0.35cqw
-			1cqw;
-
+		padding: 0.35cqw 1cqw;
 
 		width: max-content;
 
 		min-width: 14cqw;
 
+		background: linear-gradient(90deg, var(--plate-dark), rgba(42, 31, 79, 0.85));
 
-		background:
-
-			linear-gradient(
-				90deg,
-				var(--plate-sub),
-				rgba(42, 31, 79, 0.85)
-			);
-
-
-		border-bottom:
-			0.12cqw solid
-			#d9b86a;
-
+		border-bottom: 0.12cqw solid #d9b86a;
 
 		color: #f1d9a0;
-
 
 		font-size: 1.7cqw;
 
@@ -1390,411 +1415,148 @@
 
 
 	/* ==========================================================
-	   MYSTERY BLUE ORB
+	   TFT LOOT ORB STYLES (GOLD & PURPLE)
 	   ========================================================== */
 
-	.slot.blue.mystery {
-
-		background:
-	radial-gradient(
-		circle at 28% 20%,
-		rgba(255, 255, 255, 0.9),
-		transparent 10%
-	),
-	radial-gradient(
-		circle at 72% 78%,
-		rgba(24, 8, 70, 0.65),
-		transparent 40%
-	),
-	radial-gradient(
-		circle at 50% 45%,
-		rgba(188, 147, 255, 0.98),
-		rgba(119, 76, 208, 0.98) 42%,
-		rgba(77, 38, 145, 1) 70%,
-		rgba(35, 14, 75, 1) 100%
-	);
-
-		background-position:
-			center;
-
-		background-size:
-			cover;
-
-
-		border:
-			0.25cqw solid
-			rgba(207, 235, 255, 0.98);
-
-
-		box-shadow:
-
-			0 0 1.6cqw
-			rgba(75, 174, 255, 0.72),
-
-
-			0 0 3.5cqw
-			rgba(51, 132, 255, 0.28),
-
-
-			inset 0 0 1.5cqw
-			rgba(255, 255, 255, 0.22),
-
-
-			inset 0 -1.4cqw 2cqw
-			rgba(7, 18, 67, 0.4);
-
-
-		animation:
-			orbFloatBlue 3.6s
-			ease-in-out infinite;
-
-
-		isolation: isolate;
-	}
-
-
-	/* ==========================================================
-	   BLUE ORB TEXTURE
-	   ========================================================== */
-
-	.slot.blue .orb-texture {
-	position: absolute;
-	inset: 3%;
-
-	border-radius: 50%;
-
-	background:
-		radial-gradient(
-			ellipse at 27% 20%,
-			rgba(255, 255, 255, 0.42),
-			transparent 18%
-		),
-
-		radial-gradient(
-			ellipse at 65% 72%,
-			rgba(35, 10, 90, 0.28),
-			transparent 38%
-		),
-
-		radial-gradient(
-			circle at 50% 50%,
-			transparent 35%,
-			rgba(255, 255, 255, 0.08) 60%,
-			transparent 76%
-		),
-
-		linear-gradient(
-			145deg,
-			rgba(255, 255, 255, 0.16),
-			transparent 28%,
-			transparent 68%,
-			rgba(18, 5, 55, 0.18)
-		);
-
-	opacity: 0.9;
-
-	mix-blend-mode: screen;
-
-	z-index: 4;
-
-	pointer-events: none;
-}
-
-
-	/* ==========================================================
-	   BLUE GLOSS
-	   ========================================================== */
-
-	.slot.blue.mystery::before {
-	content: '';
-
-	position: absolute;
-
-	left: 12%;
-	top: 8%;
-
-	width: 38%;
-	height: 24%;
-
-	border-radius: 50%;
-
-	background:
-		radial-gradient(
-			ellipse at center,
-			rgba(255, 255, 255, 0.82),
-			rgba(255, 255, 255, 0.24) 38%,
-			transparent 72%
-		);
-
-	transform: rotate(-25deg);
-
-	filter: blur(0.12cqw);
-
-	opacity: 0.95;
-
-	z-index: 5;
-
-	pointer-events: none;
-}
-
-	/* ==========================================================
-	   GOLD ORB
-	   ========================================================== */
-
-	.slot.gold.mystery {
-
-		background:
-
-			/*
-			 * TFT gold orb artwork.
-			 */
-			var(--orb-art),
-
-
-			/*
-			 * Bright white reflection.
-			 */
-			radial-gradient(
-				circle at 29% 19%,
-				rgba(255, 255, 255, 1),
-				transparent 8%
-			),
-
-
-			/*
-			 * Deep warm shadow.
-			 */
-			radial-gradient(
-				circle at 68% 72%,
-				rgba(92, 43, 0, 0.7),
-				transparent 43%
-			),
-
-
-			/*
-			 * Main golden body.
-			 */
-			radial-gradient(
-				circle at 50% 47%,
-				rgba(255, 244, 182, 1),
-				rgba(246, 190, 72, 1) 44%,
-				rgba(185, 110, 21, 1) 71%,
-				rgba(92, 45, 4, 1) 90%
-			);
-
-
-		background-position:
-			center;
-
-		background-size:
-			cover;
-
-
-		border:
-			0.27cqw solid
-			rgba(255, 242, 191, 0.99);
-
-
-		box-shadow:
-
-			0 0 2.5cqw
-			rgba(255, 215, 118, 0.82),
-
-
-			0 0 5cqw
-			rgba(255, 185, 60, 0.3),
-
-
-			inset 0 0 1.8cqw
-			rgba(255, 255, 255, 0.28),
-
-
-			inset 0 -1.5cqw 2.2cqw
-			rgba(92, 45, 0, 0.42);
-
-
-		animation:
-			orbFloatGold 3.8s
-			ease-in-out infinite;
-
-
-		isolation: isolate;
-	}
-
-
-	/* ==========================================================
-	   GOLD TEXTURE
-	   ========================================================== */
-
-	.slot.gold .orb-texture {
-	position: absolute;
-	inset: 3%;
-
-	border-radius: 50%;
-
-	background:
-		radial-gradient(
-			ellipse at 27% 20%,
-			rgba(255, 255, 255, 0.42),
-			transparent 18%
-		),
-
-		radial-gradient(
-			ellipse at 65% 72%,
-			rgba(35, 10, 90, 0.28),
-			transparent 38%
-		),
-
-		radial-gradient(
-			circle at 50% 50%,
-			transparent 35%,
-			rgba(255, 255, 255, 0.08) 60%,
-			transparent 76%
-		),
-
-		linear-gradient(
-			145deg,
-			rgba(255, 255, 255, 0.16),
-			transparent 28%,
-			transparent 68%,
-			rgba(18, 5, 55, 0.18)
-		);
-
-	opacity: 0.9;
-
-	mix-blend-mode: screen;
-
-	z-index: 4;
-
-	pointer-events: none;
-}
-
-
-	/* ==========================================================
-	   GOLD GLOSS
-	   ========================================================== */
-
-	.slot.gold.mystery::before {
-
-		content: '';
-
-		position: absolute;
-
-
-		left: 12%;
-
-		top: 8%;
-
-
-		width: 37%;
-
-		height: 23%;
-
-
+	.slot.mystery {
 		border-radius: 50%;
+		isolation: isolate;
+	}
 
+	/* TFT Outer Ethereal Energy Halo / Aura Ring */
+	.slot.mystery::after {
+		content: '';
+		position: absolute;
+		inset: -14%;
+		border-radius: 50%;
+		pointer-events: none;
+		z-index: 1;
+		animation: tftOrbHalo 3.6s ease-in-out infinite;
+	}
 
+	.slot.gold.mystery::after {
+		border: 0.16cqw solid rgba(255, 230, 110, 0.7);
+		box-shadow:
+			0 0 1.2cqw rgba(255, 205, 50, 0.75),
+			0 0 2.8cqw rgba(245, 158, 11, 0.4),
+			inset 0 0 0.8cqw rgba(255, 240, 150, 0.4);
+	}
+
+	.slot.blue.mystery::after {
+		border: 0.16cqw solid rgba(232, 140, 255, 0.7);
+		box-shadow:
+			0 0 1.2cqw rgba(216, 100, 255, 0.75),
+			0 0 2.8cqw rgba(168, 85, 247, 0.4),
+			inset 0 0 0.8cqw rgba(245, 180, 255, 0.4);
+	}
+
+	/* TFT Purple Loot Orb (4-Star) */
+	.slot.blue.mystery {
 		background:
+			radial-gradient(circle at 26% 20%, rgba(255, 255, 255, 1) 0%, rgba(250, 232, 255, 0.95) 10%, transparent 18%),
+			radial-gradient(circle at 74% 80%, rgba(240, 171, 252, 0.65) 0%, transparent 26%),
+			radial-gradient(circle at 68% 72%, rgba(46, 16, 101, 0.88) 0%, transparent 46%),
+			radial-gradient(circle at 44% 40%, #fdf4ff 0%, #f0abfc 22%, #c084fc 46%, #7e22ce 74%, #2e1065 100%);
+		border: 0.20cqw solid rgba(245, 220, 255, 0.95);
+		box-shadow:
+			0 0 1.5cqw rgba(216, 120, 255, 0.85),
+			0 0 3.5cqw rgba(147, 51, 234, 0.45),
+			inset 0 0 1.3cqw rgba(255, 235, 255, 0.5),
+			inset 0 -1cqw 1.8cqw rgba(59, 7, 100, 0.65);
+		animation: orbFloatBlue 3.6s ease-in-out infinite;
+	}
 
-			radial-gradient(
-				ellipse,
-				rgba(255, 255, 255, 0.83),
-				rgba(255, 255, 255, 0.16) 43%,
-				transparent 73%
+	/* TFT Gold Loot Orb (5-Star) */
+	.slot.gold.mystery {
+		background:
+			radial-gradient(circle at 26% 20%, rgba(255, 255, 255, 1) 0%, rgba(255, 250, 200, 0.95) 10%, transparent 18%),
+			radial-gradient(circle at 74% 80%, rgba(254, 240, 138, 0.65) 0%, transparent 26%),
+			radial-gradient(circle at 68% 72%, rgba(69, 26, 3, 0.88) 0%, transparent 46%),
+			radial-gradient(circle at 44% 40%, #fff7c2 0%, #fde047 22%, #f59e0b 50%, #b45309 76%, #451a03 100%);
+		border: 0.22cqw solid rgba(255, 248, 200, 0.95);
+		box-shadow:
+			0 0 1.6cqw rgba(255, 215, 60, 0.85),
+			0 0 3.6cqw rgba(245, 158, 11, 0.45),
+			inset 0 0 1.4cqw rgba(255, 255, 220, 0.5),
+			inset 0 -1cqw 1.8cqw rgba(92, 45, 0, 0.65);
+		animation: orbFloatGold 3.8s ease-in-out infinite;
+	}
+
+	/* TFT Crystalline Prismatic Core Texture */
+	.slot.mystery .orb-texture {
+		position: absolute;
+		inset: 2%;
+		border-radius: 50%;
+		background:
+			radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.28) 0%, transparent 55%),
+			conic-gradient(from 30deg at 50% 50%,
+				rgba(255, 255, 255, 0.24) 0deg,
+				transparent 45deg,
+				rgba(255, 255, 255, 0.18) 90deg,
+				transparent 150deg,
+				rgba(255, 255, 255, 0.25) 210deg,
+				transparent 270deg,
+				rgba(255, 255, 255, 0.18) 330deg,
+				rgba(255, 255, 255, 0.24) 360deg
 			);
+		mix-blend-mode: overlay;
+		z-index: 4;
+		pointer-events: none;
+		animation: tftCoreSpin 16s linear infinite;
+	}
 
-
-		transform:
-			rotate(-25deg);
-
-
-		filter:
-			blur(0.15cqw);
-
-
-		opacity: 0.92;
-
+	/* TFT Curved Glass Specular Highlight */
+	.slot.mystery::before {
+		content: '';
+		position: absolute;
+		top: 6%;
+		left: 10%;
+		width: 44%;
+		height: 28%;
+		border-radius: 50%;
+		background: radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.35) 45%, transparent 75%);
+		transform: rotate(-30deg);
+		filter: blur(0.08cqw);
 		z-index: 5;
-
 		pointer-events: none;
 	}
 
-
 	/* ==========================================================
-	   QUESTION MARK
+	   TFT QUESTION MARK GLYPH
 	   ========================================================== */
 
 	.orb-question {
-
 		position: relative;
-
 		z-index: 10;
-
-
 		display: flex;
-
 		align-items: center;
-
 		justify-content: center;
-
-
 		width: 100%;
-
 		height: 100%;
-
-
-		font-size: 8cqw;
-
+		font-family: 'Trebuchet MS', 'Outfit', 'Segoe UI', system-ui, sans-serif;
+		font-size: 5.2cqw;
 		line-height: 1;
-
-		font-weight: 700;
-
-
-		color:
-			rgba(255, 255, 255, 0.98);
-
-
-		text-shadow:
-
-			0 0.18cqw
-			0.7cqw
-			rgba(10, 18, 54, 0.92),
-
-
-			0 0
-			0.5cqw
-			rgba(255, 255, 255, 0.85),
-
-
-			0 0
-			1.4cqw
-			rgba(255, 255, 255, 0.3);
-
-
+		font-weight: 900;
+		color: #ffffff;
 		pointer-events: none;
 	}
 
-
 	.slot.gold .orb-question {
-
-		font-size: 13cqw;
-
-
+		font-size: 6.5cqw;
 		text-shadow:
+			0 0 0.35cqw #ffffff,
+			0 0 1.2cqw #fde047,
+			0 0 2.4cqw #f59e0b,
+			0 0.18cqw 0.5cqw rgba(45, 18, 0, 0.95);
+	}
 
-			0 0.22cqw
-			0.8cqw
-			rgba(92, 45, 0, 0.92),
-
-
-			0 0
-			0.5cqw
-			rgba(255, 255, 255, 0.92),
-
-
-			0 0
-			1.5cqw
-			rgba(255, 243, 192, 0.48);
+	.slot.blue .orb-question {
+		font-size: 5.2cqw;
+		text-shadow:
+			0 0 0.35cqw #ffffff,
+			0 0 1.2cqw #f0abfc,
+			0 0 2.4cqw #c084fc,
+			0 0.18cqw 0.5cqw rgba(35, 8, 65, 0.95);
 	}
 
 
@@ -1899,6 +1661,30 @@
 		50% {
 			transform:
 				translateY(-7px);
+		}
+	}
+
+	@keyframes tftOrbHalo {
+		0% {
+			transform: scale(0.95) rotate(0deg);
+			opacity: 0.65;
+		}
+		50% {
+			transform: scale(1.08) rotate(180deg);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(0.95) rotate(360deg);
+			opacity: 0.65;
+		}
+	}
+
+	@keyframes tftCoreSpin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
 		}
 	}
 

@@ -1,10 +1,15 @@
 <script>
 	import { getContext } from 'svelte';
-	import { cookie } from '$lib/helpers/dataAPI/api-cookie';
 
-	import { genesis, primogem, kisses } from '$lib/store/app-stores';
+	import { genesis, kisses } from '$lib/store/app-stores';
 	import { localBalance } from '$lib/helpers/dataAPI/api-localstore';
 	import { playSfx } from '$lib/helpers/audio/audio';
+	import {
+		PACKAGE_PULLS,
+		MAX_SHOP_PULLS,
+		boughtShopPulls,
+		addBoughtShopPulls
+	} from '$lib/helpers/shop-pulls';
 
 	import Modal from '$lib/components/ModalTpl.svelte';
 	import Icon from '$lib/components/Icon.svelte';
@@ -12,63 +17,31 @@
 
 	export let data = {
 		qty: 0,
-		bonus: 0,
+		pulls: 0,
+		base: 0,
+		bonus: 0
 	};
 
 	const closeModal = getContext('closeModal');
 	const confirmBuy = getContext('confirmBuy');
 	const openObtained = getContext('openObtained');
 
-	// Keep the existing auto-convert option.
-	let autoConvert = cookie.get('autoconvert-genesis');
-
-	$: cookie.set('autoconvert-genesis', autoConvert);
-
-	/*
-	 * IMPORTANT:
-	 *
-	 * data.price comes directly from:
-	 *
-	 * src/lib/data/pricelist.json
-	 *
-	 * Your current birthday pricing is:
-	 *
-	 * 60    Genesis  = 2 Kisses
-	 * 300   Genesis  = 3 Kisses
-	 * 980   Genesis  = 4 Kisses
-	 * 1980  Genesis  = 5 Kisses
-	 * 3280  Genesis  = 7 Kisses
-	 * 6480  Genesis  = 10 Kisses
-	 *
-	 * Therefore we do NOT hardcode the prices here.
-	 */
-
-	 const KISS_PRICES = {
-	60: 2,
-	300: 3,
-	980: 4,
-	1980: 5,
-	3280: 7,
-	6480: 10
-};
-
-$: kissCost = KISS_PRICES[data.qty] ?? 0;
-
-$: canPay = $kisses >= kissCost;
-
-	const convertBuy = () => {
-		primogem.update((value) => {
-			const afterUpdate = value + data.qty + data.bonus;
-
-			localBalance.set('primogem', afterUpdate);
-
-			return afterUpdate;
-		});
+	const KISS_PRICES = {
+		60: 2,
+		300: 3,
+		980: 4,
+		1980: 5,
+		3280: 7,
+		6480: 10
 	};
 
+	$: kissCost = KISS_PRICES[data.qty] ?? 0;
+	$: pulls = PACKAGE_PULLS[data.qty] ?? 1;
+	$: remainingPulls = Math.max(0, MAX_SHOP_PULLS - $boughtShopPulls);
+	$: isOverCap = pulls > remainingPulls;
+	$: canPay = $kisses >= kissCost && !isOverCap;
+
 	const handleBuy = () => {
-		// Don't allow the purchase if she doesn't
-		// have enough Kisses.
 		if (!canPay) {
 			playSfx('close');
 			return;
@@ -79,13 +52,20 @@ $: canPay = $kisses >= kissCost;
 		 */
 		kisses.update((value) => {
 			const afterUpdate = value - kissCost;
-
 			localBalance.set('kisses', afterUpdate);
-
 			return afterUpdate;
 		});
 
-		const item = autoConvert ? 'primogem' : 'genesis';
+		genesis.update((value) => {
+			const afterUpdate = value + data.base + data.bonus;
+			localBalance.set('genesis', afterUpdate);
+			return afterUpdate;
+		});
+
+		/*
+		 * Record pulls towards the 24 wishes cap.
+		 */
+		addBoughtShopPulls(pulls);
 
 		/*
 		 * Tell the shop that the purchase succeeded.
@@ -98,32 +78,7 @@ $: canPay = $kisses >= kissCost;
 		/*
 		 * Show the obtained currency popup.
 		 */
-		openObtained([
-			{
-				qty: data.qty + data.bonus,
-				item
-			}
-		]);
-
-		/*
-		 * Automatically convert Genesis Crystals
-		 * into Primogems when the checkbox is enabled.
-		 */
-		if (autoConvert) {
-			convertBuy();
-			return;
-		}
-
-		/*
-		 * Otherwise add Genesis Crystals normally.
-		 */
-		genesis.update((value) => {
-			const afterUpdate = value + data.qty + data.bonus;
-
-			localBalance.set('genesis', afterUpdate);
-
-			return afterUpdate;
-		});
+		openObtained([{ qty: data.base + data.bonus, item: 'genesis' }]);
 	};
 
 	const close = () => {
@@ -155,8 +110,7 @@ $: canPay = $kisses >= kissCost;
 				</h1>
 
 				<p>
-					Exchange a few kisses for Genesis Crystals
-					and make another wish. ♡
+					Exchange kisses for Genesis Crystals to make birthday wishes! ♡
 				</p>
 
 			</div>
@@ -179,10 +133,7 @@ $: canPay = $kisses >= kissCost;
 
 				<div class="glow-ring"></div>
 
-				<Icon
-					type="genesis"
-					width="48%"
-				/>
+				<Icon type="genesis" width="56%" />
 
 			</div>
 
@@ -193,11 +144,11 @@ $: canPay = $kisses >= kissCost;
 				</span>
 
 				<strong>
-					Genesis Crystals ×{data.qty + data.bonus}
+					Genesis Crystals ×{data.base}
 				</strong>
 
 				<span class="product-subtitle">
-					Ready to become wishes ✦
+					+ {data.bonus} bonus Genesis Crystals! ✦
 				</span>
 
 			</div>
@@ -266,7 +217,19 @@ $: canPay = $kisses >= kissCost;
 
 
 			<!-- STATUS -->
-			{#if !canPay}
+			{#if isOverCap}
+
+				<div class="not-enough">
+
+					<span>🔒</span>
+
+					This pack gives {pulls} wishes, but only
+					<strong>{remainingPulls}</strong>
+					wish{remainingPulls === 1 ? '' : 'es'} left before the 24 wishes cap!
+
+				</div>
+
+			{:else if !canPay}
 
 				<div class="not-enough">
 
@@ -299,23 +262,6 @@ $: canPay = $kisses >= kissCost;
 		</div>
 
 
-		<!-- AUTO CONVERT -->
-		<div class="auto-convert">
-
-			<input
-				id="convert"
-				type="checkbox"
-				bind:checked={autoConvert}
-				on:change={() => playSfx('click2')}
-			/>
-
-			<label for="convert">
-				Convert the Genesis Crystals into Primogems automatically
-			</label>
-
-		</div>
-
-
 		<!-- PAYMENT BUTTON -->
 		<button
 			class="proceed"
@@ -324,7 +270,13 @@ $: canPay = $kisses >= kissCost;
 			on:click={handleBuy}
 		>
 
-			{#if canPay}
+			{#if isOverCap}
+
+				<span>
+					Exceeds 24 Wishes Cap 🔒
+				</span>
+
+			{:else if canPay}
 
 				<span>
 					Send {kissCost}
@@ -720,43 +672,6 @@ $: canPay = $kisses >= kissCost;
 
 
 	/* -------------------------------------------------- */
-	/* AUTO CONVERT */
-	/* -------------------------------------------------- */
-
-	.auto-convert {
-		display: flex;
-
-		align-items: flex-start;
-
-		gap: 0.5rem;
-
-		margin-top: 0.8rem;
-
-		font-size: 0.75rem;
-
-		line-height: 1.4;
-
-		opacity: 0.72;
-	}
-
-	.auto-convert input {
-		width: 1rem;
-
-		height: 1rem;
-
-		flex-shrink: 0;
-
-		margin-top: 0.1rem;
-
-		accent-color: #9a6a91;
-	}
-
-	.auto-convert label {
-		cursor: pointer;
-	}
-
-
-	/* -------------------------------------------------- */
 	/* BUY BUTTON */
 	/* -------------------------------------------------- */
 
@@ -880,10 +795,6 @@ $: canPay = $kisses >= kissCost;
 
 		.product-art {
 			width: 4.75rem;
-		}
-
-		.auto-convert {
-			align-items: flex-start;
 		}
 	}
 </style>

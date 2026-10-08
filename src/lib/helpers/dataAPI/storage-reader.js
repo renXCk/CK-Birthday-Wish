@@ -14,6 +14,7 @@ import {
 } from '$lib/store/app-stores';
 import { localBalance, rollCounter, localConfig } from './api-localstore';
 import { noticeMark } from '../noticeMark';
+import { checkInventoryUnlock } from '../inventory-lock';
 
 /**
  * Read Balance From LocalStorage
@@ -30,10 +31,18 @@ export const importLocalConfig = () => {
 	} = localBalance.all() || {};
 	if (!isNaN(pr)) primogem.set(pr);
 	if (!isNaN(ac)) acquaint.set(ac);
-	if (!isNaN(iw)) intertwined.set(iw);
+	const boxInit = localConfig.get('birthday_box_v4');
+	if (!boxInit) {
+		intertwined.set(0);
+		localBalance.set('intertwined', 0);
+		localConfig.set('birthday_box_v4', true);
+	} else if (!isNaN(iw)) {
+		intertwined.set(iw);
+	}
 	if (!isNaN(gs)) genesis.set(gs);
 	stardust.set(isNaN(sd) ? 0 : sd);
 	starglitter.set(isNaN(sg) ? 0 : sg);
+	checkInventoryUnlock();
 
 	const lWishAmount = localConfig.get('wishAmount') || 'default';
 	wishAmount.set(lWishAmount);

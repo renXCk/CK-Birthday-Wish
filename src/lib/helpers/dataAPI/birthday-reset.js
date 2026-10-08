@@ -1,5 +1,9 @@
-    import { browser } from '$app/environment';
+import { browser } from '$app/environment';
 import { initialAmount } from '$lib/data/wish-setup.json';
+import { resetBoxState } from '$lib/helpers/gacha/birthday-box';
+import { resetBoughtShopPulls } from '$lib/helpers/shop-pulls';
+import { checkInventoryUnlock } from '$lib/helpers/inventory-lock';
+import { localBalance, localConfig } from './api-localstore';
 
 import {
 	genesis,
@@ -26,8 +30,10 @@ export async function resetAllBirthdayData() {
 	// configuration, etc.
 	localStorage.removeItem('WishSimulator.App');
 
-	// Separate birthday-only reveal state.
+	// Separate birthday-only reveal state and box deck state.
 	localStorage.removeItem(BANNER_REVEAL_KEY);
+	resetBoxState();
+	resetBoughtShopPulls();
 
 	// IndexedDB: history + cached assets + custom banner records.
 	await clearAllIndexedDB();
@@ -36,8 +42,15 @@ export async function resetAllBirthdayData() {
 	genesis.set(initialAmount.genesis ?? 0);
 	primogem.set(initialAmount.primogem ?? 0);
 
-	acquaint.set(initialAmount.fates ?? 0);
-	intertwined.set(initialAmount.fates ?? 0);
+	acquaint.set(0);
+	intertwined.set(0);
+
+	localBalance.set('intertwined', 0);
+	localBalance.set('acquaint', 0);
+	localBalance.set('primogem', 0);
+	localBalance.set('genesis', 0);
+	localConfig.set('birthday_box_v4', true);
+	checkInventoryUnlock();
 
 	stardust.set(0);
 	starglitter.set(0);

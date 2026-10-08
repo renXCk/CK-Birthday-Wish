@@ -12,6 +12,8 @@
 	import { handleShowStarter, initializeBanner } from '$lib/helpers/banner-loader';
 	import { userCurrencies } from '$lib/helpers/currencies';
 	import { pauseSfx, playSfx } from '$lib/helpers/audio/audio';
+	import { pushToast } from '$lib/helpers/toast';
+	import { isInventoryUnlocked } from '$lib/helpers/inventory-lock';
 
 	import ModalInitBanner from './_custom-banner/ModalInitBanner.svelte';
 	import ModalWelcome from './_index/ModalWelcome.svelte';
@@ -83,6 +85,14 @@
 
 	// Page Navigation
 	const navigate = (page, updateState = true) => {
+		if (page === 'inventory' && !$isInventoryUnlocked) {
+			playSfx('close');
+			pushToast({
+				message: 'Inventory is locked!',
+				type: 'error'
+			});
+			return;
+		}
 		let beforeNavigate = pageActive;
 		pageActive = page;
 		showMenu = false;

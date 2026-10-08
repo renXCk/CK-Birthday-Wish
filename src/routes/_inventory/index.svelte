@@ -1,6 +1,6 @@
 <script>
 	// library
-	import { onMount, setContext } from 'svelte';
+	import { getContext, onMount, setContext } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { t } from 'svelte-i18n';
 	import OverlayScrollbars from 'overlayscrollbars';
@@ -18,6 +18,7 @@
 	import InventoryList from './_inventory-list.svelte';
 	import InventoryDetail from './_inventory-detail.svelte';
 	import { cookie } from '$lib/helpers/dataAPI/api-cookie';
+	import { isInventoryUnlocked } from '$lib/helpers/inventory-lock';
 
 	let headerHeight = 0;
 	let activeItem = cookie.get('inventoryTab') || 'character';
@@ -37,8 +38,13 @@
 	};
 	setContext('showItem', showItem);
 
+	const navigate = getContext('navigate');
 	let content;
 	onMount(() => {
+		if (!$isInventoryUnlocked) {
+			navigate('index');
+			return;
+		}
 		OverlayScrollbars(content, {
 			sizeAutoCapable: false,
 			className: 'os-theme-light'

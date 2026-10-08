@@ -29,6 +29,11 @@
 	$: mobileBannerStyle = $mobileMode
 		? `max-width: ${(150 / 100) * $viewportHeight}px;`
 		: tabletBannerStyle;
+	$: birthdayBannerStyle = $mobileMode
+		? `width: 96%; max-width: ${(170 / 100) * $viewportHeight}px; max-height: 85vh;`
+		: landscape
+			? 'width: 100vh; max-height: 85vh;'
+			: 'max-height: 85vh;';
 
 	$: style =
 		$viewportHeight > 800 ||
@@ -133,9 +138,10 @@
 			{#if $activeBanner === index}
 				<div
 					class="banner-item"
+					class:birthday={data.birthday}
 					class:editorOpen={editor}
 					class:fullscreen={$isMobile && $mobileMode}
-					style={mobileBannerStyle}
+					style={data.birthday ? birthdayBannerStyle : mobileBannerStyle}
 					in:fly={{ x: 25, duration: 580 }}
 				>
 					<BannerCard {data} {editor} {index} fullscreenEditor={$isMobile && $mobileMode} />
@@ -217,6 +223,12 @@
 		max-height: 75vh;
 		aspect-ratio: 27/14;
 		perspective: 1000px;
+	}
+
+	.banner-item.birthday {
+		max-width: 1200px;
+		width: 96%;
+		max-height: 85vh;
 	}
 
 	.editMode .banner-item {

@@ -2,6 +2,7 @@ import { beginnerRemaining, showBeginner } from '$lib/store/app-stores';
 import { HistoryManager } from '../dataAPI/api-indexeddb';
 import { localPity, owneditem, rollCounter } from '../dataAPI/api-localstore';
 import { getRate, prob, rates } from './probabilities';
+import { checkInventoryUnlock } from '../inventory-lock';
 
 const { addHistory } = HistoryManager;
 
@@ -15,50 +16,13 @@ const { addHistory } = HistoryManager;
 const roll = async (banner, WishInstance, indexOfBanner, forceRarity = null) => {
 	const pity5 = localPity.get(`pity5-${banner}`) + 1;
 	const pity4 = localPity.get(`pity4-${banner}`) + 1;
-	const maxPity = getRate(banner, 'max5');
 
-	const rate5star = () => {
-		return rates({
-			baseRate: getRate(banner, 'baseRate5'),
-			rateIncreasedAt: getRate(banner, 'hard5'),
-			currentPity: pity5,
-			maxPity
-		});
-	};
+	// In birthday version, get next item directly from box deck
+	const randomItem = WishInstance.drawNextItem
+		? WishInstance.drawNextItem(banner, indexOfBanner)
+		: WishInstance.getItem(forceRarity || 3, banner, indexOfBanner);
 
-	const rate4star = () => {
-		return rates({
-			baseRate: getRate(banner, 'baseRate4'),
-			currentPity: pity4,
-			rateIncreasedAt: getRate(banner, 'hard4'),
-			maxPity: getRate(banner, 'max4')
-		});
-	};
-
-	let chance5star = rate5star();
-	let chance4star = rate4star();
-	let chance3star = 100 - chance4star - chance5star;
-
-	if ((chance3star < 0 && pity5 >= maxPity) || chance5star === 100) chance4star = 0;
-	if (chance3star < 0) chance3star = 0;
-	if (chance4star === 100) chance5star = 0;
-
-	const item = [
-		{
-			rarity: 3,
-			chance: chance3star
-		},
-		{
-			rarity: 4,
-			chance: chance4star
-		},
-		{
-			rarity: 5,
-			chance: chance5star
-		}
-	];
-
-	const rarity = forceRarity || prob(item).rarity;
+	const rarity = randomItem.rarity;
 	let pity = 1;
 
 	const rollQty = rollCounter.get(banner);
@@ -87,9 +51,8 @@ const roll = async (banner, WishInstance, indexOfBanner, forceRarity = null) => 
 		localPity.set(`pity5-${banner}`, pity5);
 	}
 
-	// Get Item
-	const randomItem = WishInstance.getItem(rarity, banner, indexOfBanner);
 	const { manual, wish } = owneditem.put({ itemID: randomItem.itemID });
+	checkInventoryUnlock(true);
 	const numberOfOwnedItem = manual + wish - 1;
 	const isNew = numberOfOwnedItem < 1;
 

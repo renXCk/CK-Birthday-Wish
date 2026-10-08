@@ -25,56 +25,29 @@ export const BANNERS = [
 		bannerName: 'birthday-event',
 
 		tag: 'Birthday Event Wish',
-		title: `A Wish Written Just for ${HER_NAME}`,
+		title: 'Happy Birthday',
+		titleAccent: 'Baby Girl',
 		subtitle: 'May every little wish lead to something wonderful.',
 
 		description: [
-			'Limited-time birthday wishes containing flowers, letters, adventures, and love.',
-			'★ Featured 5★: Bloom of Everlasting Devotion'
+			'Every 10 wishes is guaranteed to include at least one 4-star or higher item',
+			"5-star event-exclusive gifts can only be obtained during their limited-time Birthday Wish and will not be available after the event ends."
 		],
 
 		image: '/banners/birthday-event.jpg',
 		buttonImage: '/banners/birthday-event-button.png',
 
-		// 1 gold mystery slot + 3 blue mystery slots
+		// 5 gold mystery slots + 4 purple mystery slots
 		featuredIds: [
 			'birthday-5star-01',
+			'birthday-5star-02',
+			'birthday-5star-03',
+			'birthday-5star-04',
+			'birthday-5star-05',
 			'birthday-4star-glaze-lily',
 			'birthday-4star-qingxin',
-			'birthday-4star-silk-flower'
-		],
-
-		featuredChance: 100,
-		itemPool: null,
-
-		mysteryArt: {
-			fiveStar: '/items/mystery-gold-orb.png',
-			fourStar: '/items/mystery-blue-orb.png'
-		}
-	},
-
-	{
-		type: 'standard',
-		character: 'birthday-standard',
-		bannerName: 'birthday-standard',
-
-		tag: 'Birthday Standard Wish',
-		title: 'Treasures Along the Journey',
-		subtitle: 'A few more surprises hidden among the flowers.',
-
-		description: [
-			'More birthday treasures, keepsakes, and Teyvat blooms.',
-			'Every pull is another little memory waiting to be found.'
-		],
-
-		image: '/banners/birthday-standard.jpg',
-		buttonImage: '/banners/birthday-standard-button.png',
-
-		featuredIds: [
-			'birthday-5star-05',
 			'birthday-4star-cecilia',
-			'birthday-4star-sumeru-rose',
-			'birthday-4star-lumidouce-bell'
+			'birthday-4star-windwheel-aster'
 		],
 
 		featuredChance: 100,
@@ -122,7 +95,7 @@ export const ITEMS = [
 	{
 		itemID: 990003,
 		name: 'birthday-5star-03',
-		label: 'Invitation: Roadtrip to Tagaytay',
+		label: 'Roadtrip Ticket: Tagaytay',
 		description:
 			'An invitation for a real-life road trip to Tagaytay — complete with food, scenery, music, and passenger-princess privileges.',
 		rarity: 5,
@@ -182,18 +155,6 @@ export const ITEMS = [
 	},
 
 	{
-		itemID: 990008,
-		name: 'birthday-4star-silk-flower',
-		label: 'Silk Flower',
-		description:
-			'A rich crimson-red bloom with a warm golden center, adding a dramatic splash of color to the arrangement.',
-		rarity: 4,
-		weaponType: 'catalyst',
-		image: ''
-		// image: '/items/silk-flower.png'
-	},
-
-	{
 		itemID: 990009,
 		name: 'birthday-4star-cecilia',
 		label: 'Cecilia',
@@ -228,19 +189,6 @@ export const ITEMS = [
 		image: '/items/windrest-flower.webp'
 		// image: '/items/lumidouce-bell.png'
 	},
-
-	{
-		itemID: 990012,
-		name: 'birthday-4star-padisarah',
-		label: 'Padisarah',
-		description:
-			'A graceful bloom from Sumeru, chosen as an extra touch of soft color for the birthday bouquet.',
-		rarity: 4,
-		weaponType: 'catalyst',
-		image: ''
-		// image: '/items/padisarah.png'
-	},
-
 	
 	{
 		itemID: 990013,
@@ -256,7 +204,6 @@ export const ITEMS = [
 
 	/* ============================== 3 STAR ============================== */
 
-
 	{
 		itemID: 990014,
 		name: 'birthday-3star-purple-flower',
@@ -265,7 +212,7 @@ export const ITEMS = [
 			'Normal Ass Purple Flower',
 		rarity: 3,
 		weaponType: 'catalyst',
-		image: 'items/purple-flower.png'
+		image: '/items/purple-flower.png'
 	},
 
 	{
@@ -276,8 +223,6 @@ export const ITEMS = [
 			'Normal Ass Pink Flower',
 		rarity: 3,
 		weaponType: 'catalyst',
-		image: 'items/pink-flower.png'
-	},
-
-
+		image: '/items/pink-flower.png'
+	}
 ];

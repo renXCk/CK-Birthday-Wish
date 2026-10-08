@@ -46,7 +46,7 @@
 	{/if}
 	<i class="gi-primo-star" />
 	<i class="gi-companion" />
-	<div class="picture">
+	<div class="picture" class:custom-picture={!!buttonImage}>
 		<div class="wrapper">
 			{#if type === 'chronicled'}
 				<img
@@ -73,7 +73,8 @@
 					in:fade
 					on:error={(e) => e.target.remove()}
 					src={buttonImage || $assets[`button/${character}`]}
-					style={positionToStyle(buttonOffset(character))}
+					style={buttonImage ? '' : positionToStyle(buttonOffset(character))}
+					class:banner-logo={!!buttonImage}
 					alt="{type} Wish"
 					crossorigin="anonymous"
 				/>
@@ -204,6 +205,35 @@
 	img.chronicled {
 		width: 75%;
 		top: 35%;
+	}
+
+	.picture.custom-picture {
+		height: 100%;
+		top: 0;
+		bottom: 0;
+	}
+
+	.custom-picture .wrapper,
+	:global(.mobile) .custom-picture .wrapper,
+	.active .custom-picture .wrapper,
+	:global(.mobile) .active .custom-picture .wrapper {
+		transform: none !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	img.banner-logo {
+		position: relative;
+		left: auto;
+		top: auto;
+		transform: none;
+		max-height: 72%;
+		max-width: 72%;
+		height: auto;
+		width: auto;
+		object-fit: contain;
+		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 	}
 
 	.discount {

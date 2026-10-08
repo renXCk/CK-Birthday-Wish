@@ -76,10 +76,7 @@
 		onWish.set(true);
 
 		for (let i = 0; i < count; i++) {
-			// Birthday rule: a x10 pull always ends with a 5-star if none dropped yet
-			const isLast = i === count - 1;
-			const need5 = GUARANTEE_5_STAR_ON_TEN_PULL && count > 1 && isLast && !tmp.some((r) => r.rarity === 5);
-			const result = await roll(bannerToRoll, WishInstance, indexOfCharBanner, need5 ? 5 : null);
+			const result = await roll(bannerToRoll, WishInstance, indexOfCharBanner);
 			tmp.push(result);
 		}
 

@@ -27,7 +27,13 @@
 		<span> {$t('history.selectWish')} </span>
 		<div class="select-box">
 			<button class="selected" on:click={() => (showSelectList = !showSelectList)}>
-				<span>{@html $t(`wish.banner.${banner}`)}</span>
+				<span>
+					{#if banner === 'character-event'}
+						Birthday Event Wish
+					{:else}
+						{@html $t(`wish.banner.${banner}`)}
+					{/if}
+				</span>
 
 				{#if v2}
 					<span class="arrow icon {showSelectList ? 'up' : 'down'}" />
@@ -40,7 +46,11 @@
 				<div class="select-list" transition:fade={{ duration: 200 }}>
 					{#each list as type, i}
 						<button class="item" class:active={selected === i} on:click={() => select(type)}>
-							{@html $t(`wish.banner.${type}`)}
+							{#if type === 'character-event'}
+								Birthday Event Wish
+							{:else}
+								{@html $t(`wish.banner.${type}`)}
+							{/if}
 						</button>
 					{/each}
 				</div>

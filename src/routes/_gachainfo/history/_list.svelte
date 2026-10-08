@@ -63,7 +63,7 @@
 					<div class="cell">{$t('history.noData')}</div>
 				</div>
 			{:else}
-				{#each getItemPage(dataToShow, page) as { name, type, rarity, time, pity, bannerName, status, custom }}
+				{#each getItemPage(dataToShow, page) as { name, label, type, rarity, time, pity, bannerName, status, custom }}
 					<div class="row">
 						<div class="cell cell0 star{rarity}">
 							{pity}
@@ -71,10 +71,21 @@
 								<span class="status"> <i class="gi-{status}" /> </span>
 							{/if}
 						</div>
-						<div class="cell cell1">{$t(type)}</div>
+						<div class="cell cell1">
+							{#if bannerName === 'birthday-event'}
+								Birthday Gift
+							{:else}
+								{$t(type)}
+							{/if}
+						</div>
 						{#if custom}
 							<div class="cell cell2 star{rarity}">
 								{name} ( 5★ )
+							</div>
+						{:else if bannerName === 'birthday-event'}
+							<div class="cell cell2 star{rarity}">
+								{label || name}
+								{#if rarity > 3} ( {rarity}★ ) {/if}
 							</div>
 						{:else}
 							<div class="cell cell2 star{rarity}">
@@ -88,6 +99,8 @@
 								{@const { name } = getBannerName(bannerName)}
 								{#if banner.match('beginner')}
 									{$t('banner.beginner')}
+								{:else if bannerName === 'birthday-event'}
+									<span>Birthday Event Wish</span>
 								{:else if custom || !name}
 									<span> {bannerName} </span>
 								{:else if banner.match(/event|chronicled/)}

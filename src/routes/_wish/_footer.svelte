@@ -21,6 +21,7 @@
 	import { isNewOutfitReleased } from '$lib/helpers/outfit';
 	import { localBanner, maintenance } from '$lib/helpers/banner-custom';
 	import { pushToast } from '$lib/helpers/toast';
+	import { isInventoryUnlocked } from '$lib/helpers/inventory-lock';
 
 	import Icon from '$lib/components/Icon.svelte';
 	import NoticeMark from '$lib/components/NoticeMark.svelte';
@@ -46,6 +47,14 @@
 
 	const navigate = getContext('navigate');
 	const changePage = (page) => {
+		if (page === 'inventory' && !$isInventoryUnlocked) {
+			playSfx('close');
+			pushToast({
+				message: 'Inventory is locked!',
+				type: 'error'
+			});
+			return;
+		}
 		navigate(page);
 		if (['inventory', 'history'].includes(page)) return playSfx(page);
 		if (page === 'shop') return playSfx('shopopen');
@@ -158,6 +167,9 @@
 				</ButtonGeneral>
 
 				<ButtonGeneral on:click={() => changePage('inventory')}>
+					{#if !$isInventoryUnlocked}
+						<i class="gi-lock" style="margin-right: 0.3rem; font-size: 0.9em; vertical-align: -1px;" />
+					{/if}
 					{$t('inventory.text')}
 				</ButtonGeneral>
 				<ButtonGeneral on:click={() => changePage('history')}>

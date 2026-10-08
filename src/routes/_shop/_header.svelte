@@ -8,6 +8,7 @@
 		primogem,
 		stardust,
 		starglitter,
+		intertwined,
 		mobileMode,
 		viewportWidth,
 		activeVersion
@@ -48,6 +49,9 @@
 	</div>
 	<div class="fates">
 		{#if ['genesis', 'outfits', 'recomended'].includes(activeShop)}
+			<MyFund type="intertwined">
+				{$intertwined}
+			</MyFund>
 			<MyFund type="primogem" plusbutton>
 				{$primogem}
 			</MyFund>
