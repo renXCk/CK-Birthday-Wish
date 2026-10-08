@@ -1,5 +1,8 @@
 import { writable } from 'svelte/store';
 import { initialAmount, version, wishPhase } from '$lib/data/wish-setup.json';
+import { browser } from '$app/environment';
+import { localBalance } from '$lib/helpers/dataAPI/api-localstore';
+
 
 const { fates, genesis: igen, primogem: ipri } = initialAmount;
 
@@ -25,6 +28,7 @@ export const intertwined = writable(fates);
 export const stardust = writable(0);
 export const starglitter = writable(0);
 export const pricelist = writable({});
+export const kisses = writable(browser ? localBalance.get('kisses') : 0);
 
 // Settings
 export const autoskip = writable(false);
