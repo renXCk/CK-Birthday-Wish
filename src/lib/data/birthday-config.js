@@ -7,9 +7,9 @@ export const HER_NAME = 'Ericka';
 export const SITE_TITLE = `Happy Birthday, ${HER_NAME}!`;
 
 export const WELCOME = {
-	heading: 'A Special Wish Awaits You',
+	heading: 'Happy Birthday, bb!',
 	message:
-		'Happy Birthday! Every wish here was prepared with love, just for you. May this little journey through Teyvat lead you to a few surprises.'
+		'surprise hehe'
 };
 
 export const GUARANTEE_5_STAR_ON_TEN_PULL = true;

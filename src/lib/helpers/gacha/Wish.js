@@ -1,5 +1,6 @@
 import { BANNERS, ITEMS } from '$lib/data/birthday-config';
 import roll from './roll';
+import { revealBirthdayItem } from '../birthday-banner-state';
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -22,6 +23,9 @@ const WISH = {
 		const useFeatured = featured.length > 0 && Math.random() * 100 < (cfg.featuredChance ?? 50);
 		const chosen = pick(useFeatured ? featured : pool);
 
+		if ((cfg.featuredIds || []).includes(chosen.name)) {
+	revealBirthdayItem(banner, chosen.name);
+}
 		return {
 			time,
 			banner,

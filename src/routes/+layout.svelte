@@ -12,10 +12,11 @@
 		viewportWidth,
 		isMobile,
 		mobileMode,
-		isPWA
+		isPWA,
+		kisses
 	} from '$lib/store/app-stores';
 	import { IDBUpdater } from '$lib/helpers/migrator/IDBUpdater';
-	import { storageLocal } from '$lib/helpers/dataAPI/api-localstore';
+	import { storageLocal, localBalance } from '$lib/helpers/dataAPI/api-localstore';
 	import { HOST, DESCRIPTION, KEYWORDS, APP_TITLE } from '$lib/env';
 	import { sync } from '$lib/helpers/dataAPI/sync';
 	import { autoExport } from '$lib/store/filesystem-store';
@@ -28,6 +29,22 @@
 
 	import Toasts from '$lib/components/Toasts.svelte';
 	import Loader from './_index/InitialLoader.svelte';
+
+	let kissConfirmation = false;
+
+const confirmKiss = () => {
+	if (!kissConfirmation) return;
+
+	kisses.update((value) => {
+		const newValue = value + 1;
+		localBalance.set('kisses', newValue);
+		return newValue;
+	});
+
+	// Immediately reset the invisible checkbox so
+	// you can click the exact same spot again.
+	kissConfirmation = false;
+};
 
 	let innerHeight;
 	let innerWidth;
@@ -161,6 +178,14 @@
 
 <Loader {isBannerLoaded} {directLoad} />
 
+<input
+	class="secret-kiss-checkbox"
+	type="checkbox"
+	bind:checked={kissConfirmation}
+	on:change={confirmKiss}
+	aria-label="Secret kiss confirmation"
+/>
+
 <main
 	class:mobile={$mobileMode}
 	class:preview
@@ -262,4 +287,23 @@
 		left: 1rem;
 		bottom: 1rem;
 	}
+
+	.secret-kiss-checkbox {
+	position: fixed;
+
+	left: 0;
+	bottom: env(safe-area-inset-bottom, 0px);
+
+	width: 14px;
+	height: 14px;
+
+	margin: 0;
+	padding: 0;
+
+	opacity: 0;
+
+	z-index: 2147483647;
+
+	cursor: pointer;
+}
 </style>

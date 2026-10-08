@@ -37,6 +37,21 @@ if (browser) {
 	});
 }
 
+export const clearAllIndexedDB = async () => {
+	const idb = await IndexedDB;
+
+	await Promise.all(
+		['history', 'assets', 'custombanner'].map(async (storeName) => {
+			if (idb.objectStoreNames.contains(storeName)) {
+				await idb.clear(storeName);
+			}
+		})
+	);
+
+	createEvent();
+	return 'success';
+};
+
 const createEvent = () => {
 	const event = new Event('storageUpdate');
 	document.dispatchEvent(event);

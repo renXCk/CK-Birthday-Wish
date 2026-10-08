@@ -17,6 +17,32 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import CheckBox from '$lib/components/CheckBox.svelte';
 	import OptionMenu from './_options.svelte';
+	import { resetAllBirthdayData } from '$lib/helpers/dataAPI/birthday-reset';
+
+
+	let showBirthdayReset = false;
+
+const openBirthdayReset = () => {
+	showBirthdayReset = true;
+	playSfx('modal');
+};
+
+const cancelBirthdayReset = () => {
+	showBirthdayReset = false;
+	playSfx('close');
+};
+
+const confirmBirthdayReset = async () => {
+	playSfx();
+	showBirthdayReset = false;
+
+	await resetAllBirthdayData();
+
+	playSfx('wishBacksound');
+
+	// Reload so every derived component starts from a truly fresh state.
+	location.reload();
+};
 
 	let optionToShow = '';
 	const handleOption = (selected) => (optionToShow = selected);
@@ -111,37 +137,25 @@
 		OverlayScrollbars(optionsContainer, { sizeAutoCapable: false, className: 'os-theme-light' });
 	});
 </script>
+{#if showBirthdayReset}
+	<Modal
+		title="Reset Birthday Progress?"
+		on:confirm={confirmBirthdayReset}
+		on:cancel={cancelBirthdayReset}
+	>
+		<div class="birthday-reset-modal">
+			<div class="reset-heart">♡</div>
 
-{#if showResetModal}
-	<Modal title={$t('menu.resetTitle')} on:confirm={confirmReset} on:cancel={cancelReset}>
-		<div class="confirmation">
-			<caption>
-				{@html $t('menu.resetPrompt')}
-			</caption>
+			<h3>Start the adventure over?</h3>
 
-			<div class="delete-option">
-				<CheckBox
-					id="_setting"
-					checked={keepSetting}
-					on:change={({ detail }) => (keepSetting = !!detail.checked)}
-				>
-					<span> {@html $t('menu.keepSetting')}</span>
-				</CheckBox>
+			<p>
+				This will reset all birthday wishes, currencies, pity, owned items,
+				wish history, and mystery-banner reveals.
+			</p>
 
-				<CheckBox
-					id="_cache"
-					checked={clearCache}
-					on:change={({ detail }) => (clearCache = !!detail.checked)}
-				>
-					{#await getStorageSize()}
-						<span>..B</span>
-					{:then size}
-						<span>
-							{@html $t('menu.clearCache', { values: { size: size } })}
-						</span>
-					{/await}
-				</CheckBox>
-			</div>
+			<p class="warning">
+				Nothing can be recovered after this.
+			</p>
 		</div>
 	</Modal>
 {/if}
@@ -187,42 +201,25 @@
 
 	<OptionMenu name="switchBanner">{$t('menu.switchBanner')}</OptionMenu>
 
-	<OptionMenu name="reset">{$t('menu.factoryReset')}</OptionMenu>
+	<button class="reset-all" on:click={openBirthdayReset}>
+	<i class="gi-refresh" />
+	<span>
+		<strong>Reset All Birthday Progress</strong>
+		<small>Clear wishes, currencies & history</small>
+	</span>
+</button>
 
 	<h2>Notes :</h2>
 	<div class="notes">
 		<ol>
 			<li>
-				I tried to create the simulator with pity system almost like the real game, the rate of
-				getting rare item will increase once you reach a certain pity depending on where banner you
-				pull. you can go <a
-					on:click|stopPropagation
-					href="https://github.com/AguzzTN54/Genshin-Impact-Wish-Simulator#pity-system"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Here
-				</a>
-				to find details of the probability. If you has any idea, please send me feedback by creating
-				<a
-					on:click|stopPropagation
-					href="https://github.com/AguzzTN54/Genshin-Impact-Wish-Simulator/issues"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					new issue here
-				</a>
+				Happy Birthday, bb!
 			</li>
 			<li>
-				This app use Localstorage and IndexedDB to save your pull history, it's native on your
-				browser, if you clear your browser data, you will lost your data that related to this app
-				too. No chance to recover it back, because we never store your data on cloud
+				Why are you here
 			</li>
 			<li>
-				This App does not collect or store any personally identifiable information about you.
-				However, this app use third party services that may collect information used to identify
-				you. The information that these third party services request will be retained on your device
-				and is not collected by me in any way.
+				Dont stay here please i did not have time to fix this
 			</li>
 		</ol>
 	</div>
@@ -272,4 +269,66 @@
 	ol li {
 		margin-bottom: 1rem;
 	}
+
+	.reset-all {
+	width: 100%;
+	margin: 0.75rem 0;
+	padding: 0.9rem 1rem;
+
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+
+	border: 1px solid rgba(180, 110, 130, 0.35);
+	border-radius: 1rem;
+
+	background:
+		linear-gradient(
+			135deg,
+			rgba(255, 244, 248, 0.92),
+			rgba(235, 244, 255, 0.92)
+		);
+
+	box-shadow:
+		0 8px 24px rgba(0, 0, 0, 0.08),
+		inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+	text-align: left;
+	cursor: pointer;
+
+	transition:
+		transform 0.18s ease,
+		box-shadow 0.18s ease;
+}
+
+.reset-all:hover {
+	transform: translateY(-2px);
+
+	box-shadow:
+		0 12px 28px rgba(0, 0, 0, 0.12),
+		inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.reset-all:active {
+	transform: scale(0.98);
+}
+
+.reset-all i {
+	font-size: 1.2rem;
+}
+
+.reset-all span {
+	display: flex;
+	flex-direction: column;
+}
+
+.reset-all strong {
+	font-size: 0.9rem;
+}
+
+.reset-all small {
+	margin-top: 0.15rem;
+	opacity: 0.65;
+	font-size: 0.75rem;
+}
 </style>
